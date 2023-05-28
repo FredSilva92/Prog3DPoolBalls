@@ -25,7 +25,7 @@ glm::mat4 Model, View, Projection;
 glm::mat3 NormalMatrix;
 GLfloat angle = 0.0f;
 
-const GLuint NumVertices = 6 * 2 * 3;
+const GLuint VertexNum = 36;
 
 void init(void);
 void display(void);
@@ -94,7 +94,7 @@ void init(void) {
     float yCoord = 0.25f;
     float zCoord = 1.25f;
     
-    GLfloat cobbleVertices[NumVertices * 6] = {
+    GLfloat parallelepipedVertex[VertexNum * 6] = {
         //*************************************************
         //                       X+ (face #0)
         // ************************************************
@@ -184,7 +184,7 @@ void init(void) {
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferStorage(GL_ARRAY_BUFFER, sizeof(cobbleVertices), cobbleVertices, 0);
+    glBufferStorage(GL_ARRAY_BUFFER, sizeof(parallelepipedVertex), parallelepipedVertex, 0);
 
     ShaderInfo  shaders[] = {
         { GL_VERTEX_SHADER,   "shaders/poolballs.vert" },
@@ -277,7 +277,7 @@ void display(void) {
     glBindVertexArray(vao);
 
     // Draw the cobble
-    glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+    glDrawArrays(GL_TRIANGLES, 0, VertexNum);
 };
 
 
