@@ -16,12 +16,18 @@
     <Filter Include="Resource Files\Shaders">
       <UniqueIdentifier>{67832d2e-3f6b-4cec-a60d-872faa1b6162}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Balls">
+      <UniqueIdentifier>{cb3a1191-afe8-42ec-a32b-0310410ef245}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LoadShaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadTextures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,6 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LoadShaders.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadTextures.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdParty\tiny_obj_loader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
