@@ -29,8 +29,12 @@ GLfloat angle = 0.0f;
 
 const GLuint VertexNum = 36;
 
+void printErrorCallback(int code, const char* description);
 void init(void);
 void display(void);
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void charCallback(GLFWwindow* window, unsigned int codepoint);
 
 glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 float lastX = 0.0f;
@@ -47,13 +51,6 @@ float zoomSpeed = 0.1f;
 
 #define WIDTH 800
 #define HEIGHT 600
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-
-
-
-void mouseCallback(GLFWwindow* window, double xpos, double ypos);
-
-
 
 
 
@@ -126,6 +123,10 @@ int main()
 
     glfwTerminate();
     return 0;
+}
+
+void printErrorCallback(int code, const char* description) {
+    cout << description << endl;
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
