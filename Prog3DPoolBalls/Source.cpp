@@ -1,5 +1,6 @@
 ﻿#define GLEW_STATIC
 #include <GL\glew.h>
+#define GLFW_USE_DWM_SWAP_INTERVAL
 #include <GLFW\glfw3.h>
 
 #include <glm\glm.hpp>
@@ -41,6 +42,9 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 int main()
 {
+    // para quando houver algum erro com a glfw
+    glfwSetErrorCallback(printErrorCallback);
+
     // Initialize GLFW
     if (!glfwInit())
     {
@@ -68,6 +72,8 @@ int main()
 
     //glfwSetScrollCallback(window, scrollCallback);
 
+    // define as teclas para ativar/desativar os diferentes tipos de luzes
+    glfwSetCharCallback(window, charCallback);
 
     // Main render loop
     while (!glfwWindowShouldClose(window))
@@ -295,4 +301,26 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 
     // Update any necessary matrices or variables used for rendering
     // ...
+}
+
+void charCallback(GLFWwindow* window, unsigned int codepoint)
+{
+    // deteta as teclas do teclado
+    switch (codepoint)
+    {
+    case '1':
+        std::cout << "Luz ambiente ativada" << std::endl;
+        break;
+    case '2':
+        std::cout << "Luz direcional ativada" << std::endl;
+        break;
+    case '3':
+        std::cout << "Luz pontual ativada" << std::endl;
+        break;
+    case '4':
+        std::cout << "Luz cónica ativada" << std::endl;
+        break;
+    default:
+        break;
+    }
 }
