@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "LoadShaders.h"
+#include "LoadTextures.h"
 
 GLuint vbo;
 GLuint vao;
@@ -231,6 +232,14 @@ void init(void) {
 
     };
 
+    vector<vector<float>> balls;
+
+    for (int i = 1; i <= 15; i++) {
+        string filename = "textures/PoolBalls/Ball" + to_string(i) + ".obj";
+        balls.push_back(LoadTextures(filename.c_str()));
+    }
+
+    
     glGenVertexArrays(1, &vao);
     // Faz bind do VAO, cujo nome est� definido em 'VAO', com o contexto do OpenGL.
     // Um VAO � criado no primero bind que lhe seja feito.
