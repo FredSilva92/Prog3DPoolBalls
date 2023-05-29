@@ -27,7 +27,7 @@
     <ClCompile Include="LoadShaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LoadTextures.cpp">
+    <ClCompile Include="PoolBalls.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,13 +41,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LoadShaders.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LoadTextures.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="PoolBalls.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="thirdParty\tiny_obj_loader.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StbImage.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

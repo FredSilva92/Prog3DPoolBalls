@@ -1,10 +1,31 @@
-#include <GL/gl.h>
+#pragma once
 
+#ifndef LOAD_SHADERS_H
+#define LOAD_SHADERS_H 1
+
+#pragma region bibliotecas
+
+#include <GL\gl.h>
+
+#pragma endregion
+
+
+#pragma region estruturas
 
 typedef struct {
-	GLenum       type;
+	GLenum type;
 	const char* filename;
-	GLuint       shader;
+	GLuint shader;
 } ShaderInfo;
 
-GLuint LoadShaders(ShaderInfo*);
+#pragma endregion
+
+
+#pragma region funções
+
+static const GLchar* readShader(const char* filename);
+GLuint loadShaders(ShaderInfo*);
+
+#pragma endregion
+
+#endif

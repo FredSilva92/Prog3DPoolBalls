@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="LoadShaders.cpp" />
-    <ClCompile Include="LoadTextures.cpp" />
+    <ClCompile Include="PoolBalls.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +137,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LoadShaders.h" />
-    <ClInclude Include="LoadTextures.h" />
+    <ClInclude Include="PoolBalls.h" />
+    <ClInclude Include="StbImage.h" />
     <ClInclude Include="thirdParty\tiny_obj_loader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
