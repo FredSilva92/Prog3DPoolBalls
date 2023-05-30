@@ -70,7 +70,7 @@ int main()
 	// quando é pressionada uma tecla (para ativar/desativar os diferentes tipos de luzes)
 	glfwSetCharCallback(window, PoolBalls::charCallback);
 
-	// Main render loop
+	// mantém a janela aberta e atualizada
 	while (!glfwWindowShouldClose(window))
 	{
 		// renderiza os objetos na cena

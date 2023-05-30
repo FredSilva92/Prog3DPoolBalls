@@ -11,6 +11,5 @@ uniform mat3 NormalMatrix;
 
 void main()
 {
-
     gl_Position = Projection * ModelView * vec4(position, 1.0);
 }

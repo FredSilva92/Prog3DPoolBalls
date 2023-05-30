@@ -37,7 +37,7 @@ using namespace std;
 
 GLuint vbo;
 GLuint vao;
-GLuint programa;
+GLuint programShader;
 
 glm::mat4 Model, View, Projection;
 glm::mat3 NormalMatrix;
@@ -65,6 +65,7 @@ void PoolBalls::init(void) {
 	float yCoord = 0.25f;
 	float zCoord = 1.25f;
 
+	// cria as posições dos vértices
 	GLfloat parallelepipedVertex[VertexNum * 6] = {
 		//*************************************************
 		//                       X+ (face #0)
@@ -98,53 +99,52 @@ void PoolBalls::init(void) {
 		// Primeiro triângulo
 		// Posições
 		-xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
-		 xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
+		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
 		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,
 		// Segundo triângulo
 		// Posições
 		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,
-		 xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
-		 xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,
-		 // ************************************************
-		 //                       Y- (face #3)
-		 // ************************************************
-		 // Primeiro triângulo
-		 // Posições
-		 -xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
-		  xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
-		 -xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
-		 // Segundo triângulo
-		 // Posições
-		 -xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
-		  xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
-		  xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
-		  // ************************************************
-		  //                       Z+ (face #4)
-		  // ************************************************
-		  // Primeiro triângulo
-		  // Posições
-		  -xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		   xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		  -xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		  // Segundo triângulo
-		  // Posições
-		  -xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		   xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		   xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		   // ************************************************
-		   //                       Z- (face #5)
-		   // ************************************************
-		   // Primeiro triângulo
-		   // Posições
-			xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-		   -xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-			xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-			// Segundo triângulo
-			// Posições
-			 xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-			-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-			-xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f
-
+		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
+		xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,
+		// ************************************************
+		//                       Y- (face #3)
+		// ************************************************
+		// Primeiro triângulo
+		// Posições
+		-xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
+		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
+		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
+		// Segundo triângulo
+		// Posições
+		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
+		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
+		xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
+		// ************************************************
+		//                       Z+ (face #4)
+		// ************************************************
+		// Primeiro triângulo
+		// Posições
+		-xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		// Segundo triângulo
+		// Posições
+		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		// ************************************************
+		//                       Z- (face #5)
+		// ************************************************
+		// Primeiro triângulo
+		// Posições
+		xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
+		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
+		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
+		// Segundo triângulo
+		// Posições
+		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
+		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
+		-xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f
 	};
 
 	vector<vector<float>> balls;
@@ -154,73 +154,82 @@ void PoolBalls::init(void) {
 		balls.push_back(PoolBalls::loadTextures(filename.c_str()));
 	}
 
+	// gera o nome para o VAO
 	glGenVertexArrays(1, &vao);
-	// Faz bind do VAO, cujo nome está definido em 'VAO', com o contexto do OpenGL.
-	// Um VAO é criado no primero bind que lhe seja feito.
-	// Este VAO passa a estar ativo até que seja feito o bind a outro VAO, ou seja feito o bind com valor 0.
+
+	// vincula o VAO ao contexto OpenGL atual
 	glBindVertexArray(vao);
 
+	// gera o nome para o VBO
 	glGenBuffers(1, &vbo);
+
+	// vincula o VBO ao contexto OpenGL atual
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	// inicializa o vbo atualmente ativo com dados imutáveis
 	glBufferStorage(GL_ARRAY_BUFFER, sizeof(parallelepipedVertex), parallelepipedVertex, 0);
 
+	// cria informações dos shaders
 	ShaderInfo  shaders[] = {
 		{ GL_VERTEX_SHADER,   "shaders/poolballs.vert" },
 		{ GL_FRAGMENT_SHADER, "shaders/poolballs.frag" },
 		{ GL_NONE, NULL }
 	};
 
-	programa = loadShaders(shaders);
-	if (!programa) exit(EXIT_FAILURE);
-	glUseProgram(programa);
+	// carrega shaders
+	programShader = loadShaders(shaders);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	// se houve erros ao carregar shaders
+	if (!programShader) {
+		cout << "Erro ao carregar shaders: " << endl;
+		exit(EXIT_FAILURE);
+	}
 
-	GLint positionId = glGetProgramResourceLocation(programa, GL_PROGRAM_INPUT, "position");
-	// Obtém a localização do atributo 'vNormal' no 'programa'.
-	GLint normalId = glGetProgramResourceLocation(programa, GL_PROGRAM_INPUT, "normal");
+	// vincula o programa shader ao contexto OpenGL atual
+	glUseProgram(programShader);
 
-	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT/*do tipo float*/, GL_FALSE, (3 + 3) * sizeof(float) /*stride*/, (void*)0);
-	glVertexAttribPointer(normalId, 3 /*3 elementos por vértice*/, GL_FLOAT/*do tipo float*/, GL_TRUE, (3 + 3) * sizeof(float) /*stride*/, (void*)(3 * sizeof(float)));
+	// obtém as localizações dos atributos no programa shader
+	GLint positionId = glGetProgramResourceLocation(programShader, GL_PROGRAM_INPUT, "position");
+	GLint normalId = glGetProgramResourceLocation(programShader, GL_PROGRAM_INPUT, "normal");
 
+	// faz a ligação entre os atributos do programa shader ao VAO e VBO ativos 
+	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (void*)0);
+	glVertexAttribPointer(normalId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_TRUE, (3 + 3) * sizeof(float), (void*)(3 * sizeof(float)));
+
+	// ativa os atributos do programa shader ao VAO ativo
 	glEnableVertexAttribArray(positionId);
 	glEnableVertexAttribArray(normalId);
 
-	Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	// matrizes de transformação
+	Model = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
 	View = glm::lookAt(
-		cameraPosition,	                 // eye (posição da câmara).
+		cameraPosition,					// eye (posição da câmara).
 		glm::vec3(0.0f, 0.0f, 0.0f),	// center (para onde está a "olhar")
 		glm::vec3(0.0f, 1.0f, 0.0f)		// up
 	);
-	Model = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 ModelView = View * Model;
+	Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 	NormalMatrix = glm::inverseTranspose(glm::mat3(ModelView));
 
-	// ****************************************************
-	// Uniforms
-	// ****************************************************
+	// obtém as localizações dos uniforms no programa shader
+	GLint modelId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Model");
+	GLint viewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "View");
+	GLint modelViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "ModelView");
+	GLint projectionId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Projection");
+	GLint normalViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "NormalMatrix");
 
-	// Atribui valor ao uniform Model
-	GLint modelId = glGetProgramResourceLocation(programa, GL_UNIFORM, "Model");
-	glProgramUniformMatrix4fv(programa, modelId, 1, GL_FALSE, glm::value_ptr(Model));
-	// Atribui valor ao uniform View
-	GLint viewId = glGetProgramResourceLocation(programa, GL_UNIFORM, "View");
-	glProgramUniformMatrix4fv(programa, viewId, 1, GL_FALSE, glm::value_ptr(View));
-	// Atribui valor ao uniform ModelView
-	GLint modelViewId = glGetProgramResourceLocation(programa, GL_UNIFORM, "ModelView");
-	glProgramUniformMatrix4fv(programa, modelViewId, 1, GL_FALSE, glm::value_ptr(ModelView));
-	// Atribui valor ao uniform Projection
-	GLint projectionId = glGetProgramResourceLocation(programa, GL_UNIFORM, "Projection");
-	glProgramUniformMatrix4fv(programa, projectionId, 1, GL_FALSE, glm::value_ptr(Projection));
-	// Atribui valor ao uniform NormalMatrix
-	GLint normalViewId = glGetProgramResourceLocation(programa, GL_UNIFORM, "NormalMatrix");
-	glProgramUniformMatrix3fv(programa, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+	// atribui o valor aos uniforms do programa shader
+	glProgramUniformMatrix4fv(programShader, modelId, 1, GL_FALSE, glm::value_ptr(Model));
+	glProgramUniformMatrix4fv(programShader, viewId, 1, GL_FALSE, glm::value_ptr(View));
+	glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(ModelView));
+	glProgramUniformMatrix4fv(programShader, projectionId, 1, GL_FALSE, glm::value_ptr(Projection));
+	glProgramUniformMatrix3fv(programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
 
+	// define a janela de renderização
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+	// ativa o teste de profundidade
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 }
 
 void PoolBalls::display(void) {
@@ -228,26 +237,28 @@ void PoolBalls::display(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	// Use the shader program
-	glUseProgram(programa);
-
-	//   Model = glm::rotate(glm::mat4(1.0f), angle += 0.0002f, glm::normalize(glm::vec3(1.0f, 1.0f, 0.0f)));
+	// matrizes de transformação
 	glm::mat4 ModelView = View * Model;
 	NormalMatrix = glm::inverseTranspose(glm::mat3(ModelView));
-	// Atribui valor ao uniform Model
-	GLint modelId = glGetProgramResourceLocation(programa, GL_UNIFORM, "Model");
-	glProgramUniformMatrix4fv(programa, modelId, 1, GL_FALSE, glm::value_ptr(Model));
-	GLint viewId = glGetProgramResourceLocation(programa, GL_UNIFORM, "View");
-	glProgramUniformMatrix4fv(programa, viewId, 1, GL_FALSE, glm::value_ptr(View));
-	GLint modelViewId = glGetProgramResourceLocation(programa, GL_UNIFORM, "ModelView");
-	glProgramUniformMatrix4fv(programa, modelViewId, 1, GL_FALSE, glm::value_ptr(ModelView));
-	// Atribui valor ao uniform NormalMatrix
-	GLint normalViewId = glGetProgramResourceLocation(programa, GL_UNIFORM, "NormalMatrix");
-	glProgramUniformMatrix3fv(programa, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
 
+	// obtém as localizações dos uniforms no programa shader
+	GLint modelId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Model");
+	GLint viewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "View");
+	GLint modelViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "ModelView");
+	GLint projectionId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Projection");
+	GLint normalViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "NormalMatrix");
+
+	// atribui o valor aos uniforms do programa shader
+	glProgramUniformMatrix4fv(programShader, modelId, 1, GL_FALSE, glm::value_ptr(Model));
+	glProgramUniformMatrix4fv(programShader, viewId, 1, GL_FALSE, glm::value_ptr(View));
+	glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(ModelView));
+	glProgramUniformMatrix4fv(programShader, projectionId, 1, GL_FALSE, glm::value_ptr(Projection));
+	glProgramUniformMatrix3fv(programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+
+	// vincula o VAO
 	glBindVertexArray(vao);
 
-	// Draw the cobble
+	// desenha na tela
 	glDrawArrays(GL_TRIANGLES, 0, VertexNum);
 };
 
