@@ -35,15 +35,17 @@ using namespace std;
 
 #pragma region variáveis globais
 
-GLuint vbo;
+const GLuint VertexNum = 36;
+GLuint tableVBO;
+GLfloat tableVertices[VertexNum * 8];
+GLuint ballsVBOs[15];
+vector<vector<float>> ballsVertices;
 GLuint vao;
 GLuint programShader;
 
 glm::mat4 Model, View, Projection;
 glm::mat3 NormalMatrix;
 GLfloat angle = 0.0f;
-
-const GLuint VertexNum = 36;
 
 glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 float lastX = 0.0f;
@@ -68,94 +70,76 @@ void PoolBalls::init(void) {
 	float xTex = 0.0f;
 	float yTex = 0.0f;
 
-	// cria as posições dos vértices
-	GLfloat parallelepipedVertex[VertexNum * 8] = {
+	// cria atributos dos vértices da mesa
+	GLfloat tableVertices[VertexNum * 8] = {
 		//*************************************************
 		//                       X+ (face #0)
 		// ************************************************
 		// Primeiro triângulo
-		// Posições
-		xCoord, -yCoord,  zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
-		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
-		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
+		// Posições						Cores					Coordenadas de textura
+		xCoord, -yCoord,  zCoord,		1.0f, 0.0f, 0.0f,		xTex, yTex,
+		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
+		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
 		// Segundo triângulo
-		// Posições
-		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
-		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
-		xCoord,  yCoord, -zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
+		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
+		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
+		xCoord,  yCoord, -zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
 		// ************************************************
 		//                       X- (face #1)
 		// ************************************************
 		// Primeiro triângulo
-		// Posições
-		-xCoord, -yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
-		-xCoord, -yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
-		-xCoord,  yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
+		-xCoord, -yCoord,  zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
+		-xCoord,  yCoord, -zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
 		// Segundo triângulo
-		// Posições
-		-xCoord,  yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
-		-xCoord, -yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
-		-xCoord,  yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
+		-xCoord,  yCoord, -zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
+		-xCoord, -yCoord,  zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
+		-xCoord,  yCoord,  zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
 		// ************************************************
 		//                       Y+ (face #2)
 		// ************************************************
 		// Primeiro triângulo
-		// Posições
-		-xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
-		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
-		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
+		-xCoord,  yCoord,  zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		 xCoord,  yCoord,  zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		-xCoord,  yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
 		// Segundo triângulo
-		// Posições
-		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
-		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
-		xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
-		// ************************************************
-		//                       Y- (face #3)
-		// ************************************************
-		// Primeiro triângulo
-		// Posições
-		-xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
-		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
-		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
-		// Segundo triângulo
-		// Posições
-		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
-		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
-		xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
-		// ************************************************
-		//                       Z+ (face #4)
-		// ************************************************
-		// Primeiro triângulo
-		// Posições
-		-xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		// Segundo triângulo
-		// Posições
-		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		// ************************************************
-		//                       Z- (face #5)
-		// ************************************************
-		// Primeiro triângulo
-		// Posições
-		xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-		// Segundo triângulo
-		// Posições
-		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-		-xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex
+		-xCoord,  yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		 xCoord,  yCoord,  zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		 xCoord,  yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		 // ************************************************
+		 //                       Y- (face #3)
+		 // ************************************************
+		 // Primeiro triângulo
+		 -xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		  xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		 -xCoord, -yCoord,  zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		 // Segundo triângulo
+		 -xCoord, -yCoord,  zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		  xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		  xCoord, -yCoord,  zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		  // ************************************************
+		  //                       Z+ (face #4)
+		  // ************************************************
+		  // Primeiro triângulo
+		  -xCoord, -yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		   xCoord, -yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		  -xCoord,  yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		  // Segundo triângulo
+		  -xCoord,  yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		   xCoord, -yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		   xCoord,  yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		   // ************************************************
+		   //                       Z- (face #5)
+		   // ************************************************
+		   // Primeiro triângulo
+			xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+		   -xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+			xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+			// Segundo triângulo
+			 xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+			-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+			-xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex
 	};
-
-	vector<vector<float>> balls;
-
-	for (int i = 1; i <= 15; i++) {
-		string filename = "textures/PoolBalls/Ball" + to_string(i) + ".obj";
-		balls.push_back(PoolBalls::loadTextures(filename.c_str()));
-	}
 
 	// gera o nome para o VAO
 	glGenVertexArrays(1, &vao);
@@ -164,16 +148,33 @@ void PoolBalls::init(void) {
 	glBindVertexArray(vao);
 
 	// gera o nome para o VBO
-	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &tableVBO);
 
 	// vincula o VBO ao contexto OpenGL atual
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, tableVBO);
 
 	// inicializa o vbo atualmente ativo com dados imutáveis
-	glBufferStorage(GL_ARRAY_BUFFER, sizeof(parallelepipedVertex), parallelepipedVertex, 0);
+	glBufferStorage(GL_ARRAY_BUFFER, sizeof(tableVertices), tableVertices, 0);
+
+	// carrega atributos dos vértices de cada bola
+	for (int i = 1; i <= 15; i++) {
+		string filename = "textures/Ball" + to_string(i) + ".obj";
+		ballsVertices.push_back(PoolBalls::loadTextures(filename.c_str()));
+	}
+
+	// gera nomes para os VBOs das bolas
+	glGenBuffers(15, ballsVBOs);
+
+	for (int i = 0; i < ballsVertices.size(); i++) {
+		// vincula o VBO ao contexto OpenGL atual
+		glBindBuffer(GL_ARRAY_BUFFER, ballsVBOs[i]);
+
+		// inicializa o vbo atualmente ativo com dados imutáveis
+		glBufferStorage(GL_ARRAY_BUFFER, ballsVertices[i].size() * sizeof(float), ballsVertices[i].data(), 0);
+	}
 
 	// cria informações dos shaders
-	ShaderInfo  shaders[] = {
+	ShaderInfo shaders[] = {
 		{ GL_VERTEX_SHADER,   "shaders/poolballs.vert" },
 		{ GL_FRAGMENT_SHADER, "shaders/poolballs.frag" },
 		{ GL_NONE, NULL }
@@ -198,8 +199,8 @@ void PoolBalls::init(void) {
 
 	// faz a ligação entre os atributos do programa shader ao VAO e VBO ativos 
 	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(normalId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glVertexAttribPointer(textCoordId, 2 /*3 elementos por vértice*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(normalId, 3 /*3 elementos por cores*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(textCoordId, 2 /*3 elementos por coordenadas da textura*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
 	// ativa os atributos do programa shader ao VAO ativo
 	glEnableVertexAttribArray(positionId);
@@ -240,23 +241,18 @@ void PoolBalls::init(void) {
 
 void PoolBalls::display(void) {
 	// limpa o buffer de cor e de profundidade
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// matrizes de transformação
 	glm::mat4 ModelView = View * Model;
 	NormalMatrix = glm::inverseTranspose(glm::mat3(ModelView));
 
 	// obtém as localizações dos uniforms no programa shader
-	GLint modelId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Model");
-	GLint viewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "View");
 	GLint modelViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "ModelView");
 	GLint projectionId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Projection");
 	GLint normalViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "NormalMatrix");
 
 	// atribui o valor aos uniforms do programa shader
-	glProgramUniformMatrix4fv(programShader, modelId, 1, GL_FALSE, glm::value_ptr(Model));
-	glProgramUniformMatrix4fv(programShader, viewId, 1, GL_FALSE, glm::value_ptr(View));
 	glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(ModelView));
 	glProgramUniformMatrix4fv(programShader, projectionId, 1, GL_FALSE, glm::value_ptr(Projection));
 	glProgramUniformMatrix3fv(programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
@@ -264,9 +260,19 @@ void PoolBalls::display(void) {
 	// vincula o VAO
 	glBindVertexArray(vao);
 
-	// desenha na tela
+	// desenha a mesa na tela
+	glBindBuffer(GL_ARRAY_BUFFER, tableVBO);
 	glDrawArrays(GL_TRIANGLES, 0, VertexNum);
-};
+
+	// desenha cada bola na tela
+	for (int i = 1; i < ballsVertices.size(); i++) {
+		glBindBuffer(GL_ARRAY_BUFFER, ballsVBOs[i]);
+		glDrawArrays(GL_POINTS, 0, ballsVertices[i].size() / 8);
+	}
+
+	// desvincula o VAO
+	glBindVertexArray(0);
+}
 
 vector<float> PoolBalls::loadTextures(const char* filename) {
 	vector<float> vertices;
