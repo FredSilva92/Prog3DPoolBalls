@@ -65,86 +65,89 @@ void PoolBalls::init(void) {
 	float yCoord = 0.25f;
 	float zCoord = 1.25f;
 
+	float xTex = 0.0f;
+	float yTex = 0.0f;
+
 	// cria as posições dos vértices
-	GLfloat parallelepipedVertex[VertexNum * 6] = {
+	GLfloat parallelepipedVertex[VertexNum * 8] = {
 		//*************************************************
 		//                       X+ (face #0)
 		// ************************************************
 		// Primeiro triângulo
 		// Posições
-		xCoord, -yCoord,  zCoord,		1.0f, 0.0f, 0.0f,
-		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,
-		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,
+		xCoord, -yCoord,  zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
+		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
+		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
 		// Segundo triângulo
 		// Posições
-		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,
-		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,
-		xCoord,  yCoord, -zCoord,		1.0f, 0.0f, 0.0f,
+		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
+		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
+		xCoord,  yCoord, -zCoord,		1.0f, 0.0f, 0.0f,      xTex, yTex,
 		// ************************************************
 		//                       X- (face #1)
 		// ************************************************
 		// Primeiro triângulo
 		// Posições
-		-xCoord, -yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,
-		-xCoord, -yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,
-		-xCoord,  yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,
+		-xCoord, -yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
+		-xCoord, -yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
+		-xCoord,  yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
 		// Segundo triângulo
 		// Posições
-		-xCoord,  yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,
-		-xCoord, -yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,
-		-xCoord,  yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,
+		-xCoord,  yCoord, -zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
+		-xCoord, -yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
+		-xCoord,  yCoord,  zCoord,	-1.0f, 0.0f, 0.0f,      xTex, yTex,
 		// ************************************************
 		//                       Y+ (face #2)
 		// ************************************************
 		// Primeiro triângulo
 		// Posições
-		-xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
-		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
-		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,
+		-xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
+		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
+		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
 		// Segundo triângulo
 		// Posições
-		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,
-		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,
-		xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,
+		-xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
+		xCoord,  yCoord,  zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
+		xCoord,  yCoord, -zCoord,	0.0f, 1.0f, 0.0f,      xTex, yTex,
 		// ************************************************
 		//                       Y- (face #3)
 		// ************************************************
 		// Primeiro triângulo
 		// Posições
-		-xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
-		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
-		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
+		-xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
+		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
+		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
 		// Segundo triângulo
 		// Posições
-		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
-		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,
-		xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,
+		-xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
+		xCoord, -yCoord, -zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
+		xCoord, -yCoord,  zCoord,	0.0f, -1.0f, 0.0f,      xTex, yTex,
 		// ************************************************
 		//                       Z+ (face #4)
 		// ************************************************
 		// Primeiro triângulo
 		// Posições
-		-xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		-xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
 		// Segundo triângulo
 		// Posições
-		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,
-		xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,
+		-xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		xCoord, -yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
+		xCoord,  yCoord, zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
 		// ************************************************
 		//                       Z- (face #5)
 		// ************************************************
 		// Primeiro triângulo
 		// Posições
-		xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
+		xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
 		// Segundo triângulo
 		// Posições
-		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,
-		-xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f
+		xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+		-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
+		-xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex
 	};
 
 	vector<vector<float>> balls;
@@ -191,14 +194,17 @@ void PoolBalls::init(void) {
 	// obtém as localizações dos atributos no programa shader
 	GLint positionId = glGetProgramResourceLocation(programShader, GL_PROGRAM_INPUT, "position");
 	GLint normalId = glGetProgramResourceLocation(programShader, GL_PROGRAM_INPUT, "normal");
+	GLint textCoordId = glGetProgramResourceLocation(programShader, GL_PROGRAM_INPUT, "textCoord");
 
 	// faz a ligação entre os atributos do programa shader ao VAO e VBO ativos 
-	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (void*)0);
-	glVertexAttribPointer(normalId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_TRUE, (3 + 3) * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(normalId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(textCoordId, 2 /*3 elementos por vértice*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
 	// ativa os atributos do programa shader ao VAO ativo
 	glEnableVertexAttribArray(positionId);
 	glEnableVertexAttribArray(normalId);
+	glEnableVertexAttribArray(textCoordId);
 
 	// matrizes de transformação
 	Model = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -303,8 +309,8 @@ vector<float> PoolBalls::loadTextures(const char* filename) {
 			vertices.push_back(normal.x);
 			vertices.push_back(normal.y);
 			vertices.push_back(normal.z);
-			//vertices.push_back(textCoord.x);
-			//vertices.push_back(textCoord.y);
+			vertices.push_back(textCoord.x);
+			vertices.push_back(textCoord.y);
 		}
 	}
 

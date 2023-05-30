@@ -61,6 +61,13 @@ int main()
 	// inicializa a cena pela primeira vez
 	PoolBalls::init();
 
+	vector<vector<float>> balls;
+
+	for (int i = 1; i <= 15; i++) {
+		string filename = "textures/PoolBalls/Ball" + to_string(i) + ".obj";
+		balls.push_back(PoolBalls::loadTextures(filename.c_str()));
+	}
+
 	// quando o utilizador faz scroll com o mouse
 	glfwSetScrollCallback(window, PoolBalls::scrollCallback);
 
