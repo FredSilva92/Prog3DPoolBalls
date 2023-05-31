@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BallMesh.cpp" />
     <ClCompile Include="LoadShaders.cpp" />
     <ClCompile Include="PoolBalls.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -136,6 +137,7 @@
     <None Include="shaders\poolballs.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BallMesh.h" />
     <ClInclude Include="LoadShaders.h" />
     <ClInclude Include="PoolBalls.h" />
     <ClInclude Include="StbImage.h" />

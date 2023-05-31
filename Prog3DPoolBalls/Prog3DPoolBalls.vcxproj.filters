@@ -16,6 +16,9 @@
     <Filter Include="Resource Files\Shaders">
       <UniqueIdentifier>{67832d2e-3f6b-4cec-a60d-872faa1b6162}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Balls">
+      <UniqueIdentifier>{cb3a1191-afe8-42ec-a32b-0310410ef245}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -25,6 +28,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PoolBalls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BallMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,6 +54,9 @@
     </ClInclude>
     <ClInclude Include="StbImage.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BallMesh.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
