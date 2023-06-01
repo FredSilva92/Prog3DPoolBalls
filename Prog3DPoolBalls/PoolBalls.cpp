@@ -35,19 +35,28 @@ using namespace std;
 
 #pragma region variáveis globais
 
-const GLuint VertexNum = 36;
+// mesa
+const GLuint numberOfTableVertices = 36;
+GLfloat tableVertices[numberOfTableVertices * 8];
+GLuint tableVAO;
 GLuint tableVBO;
-GLfloat tableVertices[VertexNum * 8];
-GLuint ballsVBOs[15];
+
+// bolas
+const GLuint numberOfBalls = 15;
+GLuint ballsVAOs[numberOfBalls];
+GLuint ballsVBOs[numberOfBalls];
 vector<vector<float>> ballsVertices;
-GLuint vao;
+
+// shaders
 GLuint programShader;
 
+// câmara
 glm::mat4 Model, View, Projection;
 glm::mat3 NormalMatrix;
 GLfloat angle = 0.0f;
-
 glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
+
+// eventos do mouse
 float lastX = 0.0f;
 float lastY = 0.0f;
 bool firstMouse = true;
@@ -63,15 +72,17 @@ float zoomSpeed = 0.1f;
 #pragma region funções da biblioteca PoolBalls
 
 void PoolBalls::init(void) {
+	// posição da mesa
 	float xCoord = 1.25f;
 	float yCoord = 0.25f;
 	float zCoord = 1.25f;
 
+	// coordenadas de textura da mesa
 	float xTex = 0.0f;
 	float yTex = 0.0f;
 
 	// cria atributos dos vértices da mesa
-	GLfloat tableVertices[VertexNum * 8] = {
+	GLfloat tableVertices[numberOfTableVertices * 8] = {
 		//*************************************************
 		//                       X+ (face #0)
 		// ************************************************
@@ -99,78 +110,117 @@ void PoolBalls::init(void) {
 		//                       Y+ (face #2)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord,  yCoord,  zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
-		 xCoord,  yCoord,  zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
-		-xCoord,  yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		-xCoord, yCoord, zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		xCoord, yCoord, zCoord,			0.0f, 1.0f, 0.0f,      xTex, yTex,
+		-xCoord, yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
 		// Segundo triângulo
-		-xCoord,  yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
-		 xCoord,  yCoord,  zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
-		 xCoord,  yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
-		 // ************************************************
-		 //                       Y- (face #3)
-		 // ************************************************
-		 // Primeiro triângulo
-		 -xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		  xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		 -xCoord, -yCoord,  zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		 // Segundo triângulo
-		 -xCoord, -yCoord,  zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		  xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		  xCoord, -yCoord,  zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		  // ************************************************
-		  //                       Z+ (face #4)
-		  // ************************************************
-		  // Primeiro triângulo
-		  -xCoord, -yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		   xCoord, -yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		  -xCoord,  yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		  // Segundo triângulo
-		  -xCoord,  yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		   xCoord, -yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		   xCoord,  yCoord,  zCoord,	0.0f, 0.0f, 1.0f,      xTex, yTex,
-		   // ************************************************
-		   //                       Z- (face #5)
-		   // ************************************************
-		   // Primeiro triângulo
-			xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-		   -xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-			xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-			// Segundo triângulo
-			 xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-			-xCoord, -yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex,
-			-xCoord,  yCoord, -zCoord,	0.0f, 0.0f, -1.0f,      xTex, yTex
+		-xCoord, yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		xCoord, yCoord, zCoord,			0.0f, 1.0f, 0.0f,      xTex, yTex,
+		xCoord, yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		// ************************************************
+		//                       Y- (face #3)
+		// ************************************************
+		// Primeiro triângulo
+		-xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		-xCoord, -yCoord, zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		// Segundo triângulo
+		-xCoord, -yCoord, zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		xCoord, -yCoord, zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		// ************************************************
+		//                       Z+ (face #4)
+		// ************************************************
+		// Primeiro triângulo
+		-xCoord, -yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		xCoord, -yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		-xCoord, yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		// Segundo triângulo
+		-xCoord, yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		xCoord, -yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		xCoord,  yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		// ************************************************
+		//                       Z- (face #5)
+		// ************************************************
+		// Primeiro triângulo
+		xCoord, -yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
+		xCoord, yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
+		// Segundo triângulo
+		xCoord, yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
+		-xCoord, yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex
 	};
 
-	// gera o nome para o VAO
-	glGenVertexArrays(1, &vao);
+	// gera o nome para o VAO da mesa
+	glGenVertexArrays(1, &tableVAO);
 
 	// vincula o VAO ao contexto OpenGL atual
-	glBindVertexArray(vao);
+	glBindVertexArray(tableVAO);
 
-	// gera o nome para o VBO
+	// gera o nome para o VBO da mesa
 	glGenBuffers(1, &tableVBO);
 
 	// vincula o VBO ao contexto OpenGL atual
 	glBindBuffer(GL_ARRAY_BUFFER, tableVBO);
 
-	// inicializa o vbo atualmente ativo com dados imutáveis
+	// inicializa o VBO atualmente ativo com dados imutáveis
 	glBufferStorage(GL_ARRAY_BUFFER, sizeof(tableVertices), tableVertices, 0);
 
-	// carrega atributos dos vértices de cada bola
-	for (int i = 1; i <= 15; i++) {
+	// ativar atributos das posições dos vértices
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// ativar atributos das cores dos vértices
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	// ativar atributos das coordenadas de textura dos vértices
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	// desvincula o VAO atual
+	glBindVertexArray(0);
+
+	// carrega os atributos dos vértices de cada bola a partir de ficheiros .obj
+	for (int i = 1; i <= numberOfBalls; i++) {
 		string filename = "textures/Ball" + to_string(i) + ".obj";
 		ballsVertices.push_back(PoolBalls::loadTextures(filename.c_str()));
 	}
 
-	// gera nomes para os VBOs das bolas
-	glGenBuffers(15, ballsVBOs);
+	// gera nomes para os VAOs das bolas
+	glGenVertexArrays(numberOfBalls, ballsVAOs);
 
+	// vincula cada VAO das bolas ao contexto OpenGL atual
+	for (int i = 0; i < numberOfBalls; i++) {
+		glBindVertexArray(ballsVAOs[i]);
+	}
+
+	// gera nomes para os VBOs das bolas
+	glGenBuffers(numberOfBalls, ballsVBOs);
+
+	// cria e configurar cada VBO das bolas
 	for (int i = 0; i < ballsVertices.size(); i++) {
 		// vincula o VBO ao contexto OpenGL atual
 		glBindBuffer(GL_ARRAY_BUFFER, ballsVBOs[i]);
 
 		// inicializa o vbo atualmente ativo com dados imutáveis
 		glBufferStorage(GL_ARRAY_BUFFER, ballsVertices[i].size() * sizeof(float), ballsVertices[i].data(), 0);
+
+		// ativar atributos das posições dos vértices
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		// ativar atributos das cores dos vértices
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+
+		// ativar atributos das coordenadas de textura dos vértices
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
+
+		// desvincula o VAO atual
+		glBindVertexArray(0);
 	}
 
 	// cria informações dos shaders
@@ -257,21 +307,15 @@ void PoolBalls::display(void) {
 	glProgramUniformMatrix4fv(programShader, projectionId, 1, GL_FALSE, glm::value_ptr(Projection));
 	glProgramUniformMatrix3fv(programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
 
-	// vincula o VAO
-	glBindVertexArray(vao);
-
 	// desenha a mesa na tela
-	glBindBuffer(GL_ARRAY_BUFFER, tableVBO);
-	glDrawArrays(GL_TRIANGLES, 0, VertexNum);
+	glBindVertexArray(tableVAO);
+	glDrawArrays(GL_TRIANGLES, 0, numberOfTableVertices);
 
 	// desenha cada bola na tela
-	for (int i = 1; i < ballsVertices.size(); i++) {
-		glBindBuffer(GL_ARRAY_BUFFER, ballsVBOs[i]);
+	for (int i = 0; i < ballsVertices.size(); i++) {
+		glBindVertexArray(ballsVAOs[i]);
 		glDrawArrays(GL_POINTS, 0, ballsVertices[i].size() / 8);
 	}
-
-	// desvincula o VAO
-	glBindVertexArray(0);
 }
 
 vector<float> PoolBalls::loadTextures(const char* filename) {
@@ -288,7 +332,6 @@ vector<float> PoolBalls::loadTextures(const char* filename) {
 
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
-
 			glm::vec4 pos = {
 				attributes.vertices[index.vertex_index],
 				attributes.vertices[index.vertex_index + 1],
