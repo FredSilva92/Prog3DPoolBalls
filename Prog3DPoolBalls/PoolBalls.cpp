@@ -319,19 +319,39 @@ void PoolBalls::display(void) {
 	glBindVertexArray(_tableVAO);
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
 
+	
+	
+	
+	std::vector<glm::vec3> _ballPositions = {
+	glm::vec3(1.1f, 0.33f, 1.1f),  // Position for ball 1
+	glm::vec3(-1.1f, 0.33f, -1.1f),  // Position for ball 2
+	glm::vec3(-1.1f, 0.33f, 1.1f),  // Position for ball 3
+	glm::vec3(1.1f, 0.33f, -1.1f),  // Position for ball 4
+	glm::vec3(0.1f, 0.33f, -0.1f),  // Position for ball 5
+	glm::vec3(-0.3f, 0.33f, -0.3f),  // Position for ball 6
+	glm::vec3(-0.6f, 0.33f, -0.4f),  // Position for ball 7
+	glm::vec3(0.8f, 0.33f, 0.7f),  // Position for ball 8
+	glm::vec3(-0.8f, 0.33f, -0.2f),  // Position for ball 9
+	glm::vec3(0.3f, 0.33f, 0.7f),  // Position for ball 10
+	glm::vec3(-0.2f, 0.33f, -0.8f),  // Position for ball 11
+	glm::vec3(0.7f, 0.33f, 0.5f),  // Position for ball 12
+	glm::vec3(-0.9f, 0.33f, 0.6f),  // Position for ball 13
+	glm::vec3(0.1f, 0.33f, 0.3f),  // Position for ball 14
+	glm::vec3(0.4f, 0.33f, -0.6f),  // Position for ball 15
+	
+	};
+
+
+
 	// para cada bola
 	for (int i = 0; i < _ballsVertices.size(); i++) {
 		// translação da mesa
-		translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
+		translatedModel = glm::translate(_model, _ballPositions[i]);
 
-		// testar outra posição de uma bola
-		if (i == 0) {
-			// translação da mesa
-			translatedModel = glm::translate(_model, glm::vec3(1.0f, 0.0f, 0.0f));
-		}
+		glm::mat4 scaledModel = glm::scale(translatedModel, glm::vec3(0.08f));
 
 		// modelo de visualização do objeto
-		modelView = _view * translatedModel;
+		modelView = _view * scaledModel;
 
 		// obtém a localização do uniform
 		modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
