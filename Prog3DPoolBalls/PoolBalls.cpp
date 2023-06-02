@@ -294,7 +294,7 @@ void PoolBalls::display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// translação da mesa
-	glm::mat4 translatedModel = glm::translate(_model, glm::vec3(0.5f, 0.0f, 0.0f));
+	glm::mat4 translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// modelo de visualização do objeto
 	glm::mat4 modelView = _view * translatedModel;
@@ -312,19 +312,25 @@ void PoolBalls::display(void) {
 	// para cada bola
 	for (int i = 0; i < _ballsVertices.size(); i++) {
 		// translação da mesa
-		glm::mat4 translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
+		translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
+		
+		// testar outra posição de uma bola
+		if (i == 0) {
+			// translação da mesa
+			translatedModel = glm::translate(_model, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
 
 		// modelo de visualização do objeto
-		glm::mat4 modelView = _view * translatedModel;
+		modelView = _view * translatedModel;
 
 		// obtém a localização do uniform
-		GLint modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
+		modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
 
 		// atribui o valor ao uniform
 		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
 		// desenha a bola na tela
-		glBindVertexArray(_ballsVAOs[i]);
+		glBindVertexArray(0);
 		glDrawArrays(GL_POINTS, 0, _ballsVertices[i].size() / 8);
 	}
 }
