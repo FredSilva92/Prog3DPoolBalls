@@ -87,8 +87,8 @@ void PoolBalls::init(void) {
 	};
 
 	// coordenadas de textura da mesa
-	float xTex = 0.0f;
-	float yTex = 0.0f;
+	float xTexture = 0.0f;
+	float yTexture = 0.0f;
 
 	// cria atributos dos vértices da mesa
 	GLfloat _tableVertices[_numberOfTableVertices * 8] = {
@@ -97,68 +97,68 @@ void PoolBalls::init(void) {
 		// ************************************************
 		// Primeiro triângulo
 		// Posições						Cores											Coordenadas de textura
-		xCoord, -yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],		xTex, yTex,
-		xCoord, -yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
-		xCoord,  yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
+		xCoord, -yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],		xTexture, yTexture,
+		xCoord, -yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
+		xCoord,  yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
 		// Segundo triângulo
-		xCoord,  yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
-		xCoord, -yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
-		xCoord,  yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
+		xCoord,  yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
+		xCoord, -yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
+		xCoord,  yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
 		// ************************************************
 		//                       X- (face #1)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, -yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
-		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
-		-xCoord,  yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
+		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
+		-xCoord,  yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
 		// Segundo triângulo
-		-xCoord,  yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
-		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
-		-xCoord,  yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
+		-xCoord,  yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
+		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
+		-xCoord,  yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
 		// ************************************************
 		//                       Y+ (face #2)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, yCoord, zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
-		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
-		-xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
+		-xCoord, yCoord, zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
+		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
+		-xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
 		// Segundo triângulo
-		-xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
-		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
-		xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
+		-xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
+		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
+		xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
 		// ************************************************
 		//                       Y- (face #3)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
-		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
-		-xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
+		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
+		-xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
 		// Segundo triângulo
-		-xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
-		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
-		xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
+		-xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
+		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
+		xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
 		// ************************************************
 		//                       Z+ (face #4)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
-		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
-		-xCoord, yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
+		-xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
+		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
+		-xCoord, yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
 		// Segundo triângulo
-		-xCoord, yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
-		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
-		xCoord,  yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
+		-xCoord, yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
+		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
+		xCoord,  yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
 		// ************************************************
 		//                       Z- (face #5)
 		// ************************************************
 		// Primeiro triângulo
-		xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
-		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
-		xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
+		xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
+		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
+		xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
 		// Segundo triângulo
-		xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
-		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
-		-xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex
+		xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
+		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
+		-xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture
 	};
 
 	// gera o nome para o VAO da mesa
@@ -376,8 +376,6 @@ vector<float> PoolBalls::loadTextures(const char* filename) {
 				attributes.texcoords[index.texcoord_index],
 				attributes.texcoords[index.texcoord_index + 1]
 			};
-
-			//pos = preTransform * pos;
 
 			vertices.push_back(pos.x);
 			vertices.push_back(pos.y);
