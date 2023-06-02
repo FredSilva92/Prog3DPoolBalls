@@ -1,8 +1,11 @@
 #version 440 core
 
-out vec4 FragColor;
+in vec3 color;
+
+layout (location = 0) out vec4 fColor;   // cor final do fragmento
 
 void main()
 {
-    FragColor = vec4(1.0, 0.0, 0.0, 1.0);  // Red color for simplicity
+	//fColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	fColor = vec4(color, 1.0f);
 }

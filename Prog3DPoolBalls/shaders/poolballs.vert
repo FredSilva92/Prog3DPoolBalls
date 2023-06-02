@@ -1,7 +1,11 @@
 #version 440 core
 
-in vec3 position;
-in vec3 normal;
+layout(location = 0) in vec3 vPosition;
+layout(location = 1) in vec3 vColors;
+layout(location = 2) in vec2 vTextureCoords;
+
+layout(location = 0) out vec3 color;
+layout(location = 1) out vec2 textureCoord;
 
 uniform mat4 Model;
 uniform mat4 View;
@@ -11,5 +15,7 @@ uniform mat3 NormalMatrix;
 
 void main()
 {
-    gl_Position = Projection * ModelView * vec4(position, 1.0);
+    gl_Position = Projection * ModelView * vec4(vPosition, 1.0);
+    color = vColors;
+	textureCoord = vTextureCoords;
 }

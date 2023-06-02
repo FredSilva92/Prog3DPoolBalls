@@ -8,7 +8,6 @@
 using namespace std;
 
 #include <fstream>
-#include <vector>
 
 #define GLEW_STATIC
 #include <GL\glew.h>
@@ -77,6 +76,16 @@ void PoolBalls::init(void) {
 	float yCoord = 0.25f;
 	float zCoord = 1.25f;
 
+	// cores da mesa
+	vector<glm::vec3> colors{
+		glm::vec3(1.0f, 0.0f, 0.0f),	   // vermelho
+			glm::vec3(1.0f, 1.0f, 0.0f),   // amarelo
+			glm::vec3(0.0f, 1.0f, 0.0f),   // verde
+			glm::vec3(0.0f, 1.0f, 1.0f),   // ciano
+			glm::vec3(0.0f, 0.0f, 1.0f),   // azul
+			glm::vec3(1.0f, 0.0f, 1.0f)	   // magenta
+	};
+
 	// coordenadas de textura da mesa
 	float xTex = 0.0f;
 	float yTex = 0.0f;
@@ -87,69 +96,69 @@ void PoolBalls::init(void) {
 		//                       X+ (face #0)
 		// ************************************************
 		// Primeiro triângulo
-		// Posições						Cores					Coordenadas de textura
-		xCoord, -yCoord,  zCoord,		1.0f, 0.0f, 0.0f,		xTex, yTex,
-		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
-		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
+		// Posições						Cores											Coordenadas de textura
+		xCoord, -yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],		xTex, yTex,
+		xCoord, -yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
+		xCoord,  yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
 		// Segundo triângulo
-		xCoord,  yCoord,  zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
-		xCoord, -yCoord, -zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
-		xCoord,  yCoord, -zCoord,		1.0f, 0.0f, 0.0f,       xTex, yTex,
+		xCoord,  yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
+		xCoord, -yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
+		xCoord,  yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTex, yTex,
 		// ************************************************
 		//                       X- (face #1)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, -yCoord, -zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
-		-xCoord, -yCoord,  zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
-		-xCoord,  yCoord, -zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
+		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
+		-xCoord,  yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
 		// Segundo triângulo
-		-xCoord,  yCoord, -zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
-		-xCoord, -yCoord,  zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
-		-xCoord,  yCoord,  zCoord,		-1.0f, 0.0f, 0.0f,		xTex, yTex,
+		-xCoord,  yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
+		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
+		-xCoord,  yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTex, yTex,
 		// ************************************************
 		//                       Y+ (face #2)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, yCoord, zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
-		xCoord, yCoord, zCoord,			0.0f, 1.0f, 0.0f,      xTex, yTex,
-		-xCoord, yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		-xCoord, yCoord, zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
+		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
+		-xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
 		// Segundo triângulo
-		-xCoord, yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
-		xCoord, yCoord, zCoord,			0.0f, 1.0f, 0.0f,      xTex, yTex,
-		xCoord, yCoord, -zCoord,		0.0f, 1.0f, 0.0f,      xTex, yTex,
+		-xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
+		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
+		xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTex, yTex,
 		// ************************************************
 		//                       Y- (face #3)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		-xCoord, -yCoord, zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
+		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
+		-xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
 		// Segundo triângulo
-		-xCoord, -yCoord, zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		xCoord, -yCoord, -zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
-		xCoord, -yCoord, zCoord,		0.0f, -1.0f, 0.0f,		xTex, yTex,
+		-xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
+		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
+		xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTex, yTex,
 		// ************************************************
 		//                       Z+ (face #4)
 		// ************************************************
 		// Primeiro triângulo
-		-xCoord, -yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
-		xCoord, -yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
-		-xCoord, yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		-xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
+		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
+		-xCoord, yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
 		// Segundo triângulo
-		-xCoord, yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
-		xCoord, -yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
-		xCoord,  yCoord, zCoord,		0.0f, 0.0f, 1.0f,      xTex, yTex,
+		-xCoord, yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
+		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
+		xCoord,  yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTex, yTex,
 		// ************************************************
 		//                       Z- (face #5)
 		// ************************************************
 		// Primeiro triângulo
-		xCoord, -yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
-		-xCoord, -yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
-		xCoord, yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
+		xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
+		xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
 		// Segundo triângulo
-		xCoord, yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
-		-xCoord, -yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex,
-		-xCoord, yCoord, -zCoord,		0.0f, 0.0f, -1.0f,      xTex, yTex
+		xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
+		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex,
+		-xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTex, yTex
 	};
 
 	// gera o nome para o VAO da mesa
@@ -243,13 +252,13 @@ void PoolBalls::init(void) {
 	glUseProgram(_programShader);
 
 	// obtém as localizações dos atributos no programa shader
-	GLint positionId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "position");
-	GLint normalId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "normal");
-	GLint textCoordId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "textCoord");
+	GLint positionId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "vPosition");
+	GLint normalId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "vNormal");
+	GLint textCoordId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "vTextureCoords");
 
 	// faz a ligação entre os atributos do programa shader ao VAO e VBO ativos 
 	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(normalId, 3 /*3 elementos por cores*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(normalId, 3 /*3 elementos por cor*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glVertexAttribPointer(textCoordId, 2 /*3 elementos por coordenadas da textura*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
 	// ativa os atributos do programa shader ao VAO ativo
@@ -287,6 +296,7 @@ void PoolBalls::init(void) {
 
 	// ativa o teste de profundidade
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 }
 
 void PoolBalls::display(void) {
@@ -313,7 +323,7 @@ void PoolBalls::display(void) {
 	for (int i = 0; i < _ballsVertices.size(); i++) {
 		// translação da mesa
 		translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
-		
+
 		// testar outra posição de uma bola
 		if (i == 0) {
 			// translação da mesa
