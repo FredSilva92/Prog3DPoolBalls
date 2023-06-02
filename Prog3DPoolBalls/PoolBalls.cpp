@@ -51,8 +51,8 @@ vector<vector<float>> ballsVertices;
 GLuint programShader;
 
 // câmara
-glm::mat4 Model, View, Projection;
-glm::mat3 NormalMatrix;
+glm::mat4 model, view, projection;
+glm::mat3 normalMatrix;
 GLfloat angle = 0.0f;
 glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 
@@ -258,15 +258,15 @@ void PoolBalls::init(void) {
 	glEnableVertexAttribArray(textCoordId);
 
 	// matrizes de transformação
-	Model = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-	View = glm::lookAt(
+	model = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	view = glm::lookAt(
 		cameraPosition,					// eye (posição da câmara).
 		glm::vec3(0.0f, 0.0f, 0.0f),	// center (para onde está a "olhar")
 		glm::vec3(0.0f, 1.0f, 0.0f)		// up
 	);
-	glm::mat4 ModelView = View * Model;
-	Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	NormalMatrix = glm::inverseTranspose(glm::mat3(ModelView));
+	glm::mat4 modelView = view * model;
+	projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
 
 	// obtém as localizações dos uniforms no programa shader
 	GLint modelId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Model");
@@ -276,11 +276,11 @@ void PoolBalls::init(void) {
 	GLint normalViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "NormalMatrix");
 
 	// atribui o valor aos uniforms do programa shader
-	glProgramUniformMatrix4fv(programShader, modelId, 1, GL_FALSE, glm::value_ptr(Model));
-	glProgramUniformMatrix4fv(programShader, viewId, 1, GL_FALSE, glm::value_ptr(View));
-	glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(ModelView));
-	glProgramUniformMatrix4fv(programShader, projectionId, 1, GL_FALSE, glm::value_ptr(Projection));
-	glProgramUniformMatrix3fv(programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+	glProgramUniformMatrix4fv(programShader, modelId, 1, GL_FALSE, glm::value_ptr(model));
+	glProgramUniformMatrix4fv(programShader, viewId, 1, GL_FALSE, glm::value_ptr(view));
+	glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
+	glProgramUniformMatrix4fv(programShader, projectionId, 1, GL_FALSE, glm::value_ptr(projection));
+	glProgramUniformMatrix3fv(programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
 	// define a janela de renderização
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -293,19 +293,17 @@ void PoolBalls::display(void) {
 	// limpa o buffer de cor e de profundidade
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// matrizes de transformação
-	glm::mat4 ModelView = View * Model;
-	NormalMatrix = glm::inverseTranspose(glm::mat3(ModelView));
+	// translação da mesa
+	glm::mat4 translatedModel = glm::translate(model, glm::vec3(0.5f, 0.0f, 0.0f));
 
-	// obtém as localizações dos uniforms no programa shader
+	// modelo de visualização do objeto
+	glm::mat4 modelView = view * translatedModel;
+
+	// obtém a localização do uniform
 	GLint modelViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "ModelView");
-	GLint projectionId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "Projection");
-	GLint normalViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "NormalMatrix");
 
-	// atribui o valor aos uniforms do programa shader
-	glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(ModelView));
-	glProgramUniformMatrix4fv(programShader, projectionId, 1, GL_FALSE, glm::value_ptr(Projection));
-	glProgramUniformMatrix3fv(programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+	// atribui o valor ao uniform
+	glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
 	// desenha a mesa na tela
 	glBindVertexArray(tableVAO);
@@ -313,6 +311,18 @@ void PoolBalls::display(void) {
 
 	// desenha cada bola na tela
 	for (int i = 0; i < ballsVertices.size(); i++) {
+		// translação da mesa
+		glm::mat4 translatedModel = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+
+		// modelo de visualização do objeto
+		glm::mat4 modelView = view * translatedModel;
+
+		// obtém a localização do uniform
+		GLint modelViewId = glGetProgramResourceLocation(programShader, GL_UNIFORM, "ModelView");
+
+		// atribui o valor ao uniform
+		glProgramUniformMatrix4fv(programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
+
 		glBindVertexArray(ballsVAOs[i]);
 		glDrawArrays(GL_POINTS, 0, ballsVertices[i].size() / 8);
 	}
@@ -384,7 +394,7 @@ void PoolBalls::scrollCallback(GLFWwindow* window, double xoffset, double yoffse
 	// Calculate the zoom factor based on the scroll offset
 	float zoomFactor = 1.0f + static_cast<float>(yoffset) * zoomSpeed;
 
-	View = glm::scale(View, glm::vec3(zoomFactor, zoomFactor, 1.0f));
+	view = glm::scale(view, glm::vec3(zoomFactor, zoomFactor, 1.0f));
 
 	zoomLevel += yoffset * zoomSpeed;
 	zoomLevel = std::max(minZoom, std::min(maxZoom, zoomLevel));
@@ -416,13 +426,13 @@ void PoolBalls::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	float sensitivity = 0.1f;
 
 	// Aplicar rotação horizontal 
-	View = glm::rotate(View, glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f));
+	view = glm::rotate(view, glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// Calcular o vetor direito da câmera
-	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(View[2])));
+	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(view[2])));
 
 	// Aplicar rotação vertical 
-	View = glm::rotate(View, glm::radians(yOffset), right);
+	view = glm::rotate(view, glm::radians(yOffset), right);
 }
 
 void PoolBalls::charCallback(GLFWwindow* window, unsigned int codepoint)
