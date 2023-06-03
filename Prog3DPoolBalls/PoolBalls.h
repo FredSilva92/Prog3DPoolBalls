@@ -47,19 +47,6 @@ namespace PoolBalls {
 		std::string mapKd;
 	} Material;
 
-	// extrutura para armazenados dados da textura
-	typedef struct {
-		std::string newmtl;
-		float ns;
-		std::vector<float> ka;
-		std::vector<float> kd;
-		std::vector<float> ks;
-		float ni;
-		float d;
-		int illum;
-		std::string mapKd;
-	} Texture;
-
 #pragma endregion
 
 
@@ -70,7 +57,7 @@ namespace PoolBalls {
 	std::vector<float> load3dModel(const char* objFilename);
 	std::string getMtlFromObj(const char* objFilename);
 	Material loadMaterial(const char* mtlFilename);
-	void loadTexture(std::string imageFilename);
+	void loadTextures(std::vector<string> imageFilenames);
 
 #pragma endregion
 

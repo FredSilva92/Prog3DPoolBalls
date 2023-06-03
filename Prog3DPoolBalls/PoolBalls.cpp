@@ -38,7 +38,7 @@ using namespace std;
 const GLuint _numberOfTableVertices = 36;
 GLfloat _tableVertices[_numberOfTableVertices * 8];
 GLuint _tableVAO;
-GLuint tableVBO;
+GLuint _tableVBO;
 
 // bolas
 const GLuint _numberOfBalls = 15;
@@ -169,10 +169,10 @@ void PoolBalls::init(void) {
 	glBindVertexArray(_tableVAO);
 
 	// gera o nome para o VBO da mesa
-	glGenBuffers(1, &tableVBO);
+	glGenBuffers(1, &_tableVBO);
 
 	// vincula o VBO ao contexto OpenGL atual
-	glBindBuffer(GL_ARRAY_BUFFER, tableVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _tableVBO);
 
 	// inicializa o VBO atualmente ativo com dados imutáveis
 	glBufferStorage(GL_ARRAY_BUFFER, sizeof(_tableVertices), _tableVertices, 0);
@@ -201,9 +201,15 @@ void PoolBalls::init(void) {
 		_ballsMaterials.push_back(PoolBalls::loadMaterial(mtlFilename.c_str()));
 	}
 
+	// guarda os nomes dos ficheiros das texturas
+	vector<string> textureFilenames;
+	for (int i = 0; i < 2/*_numberOfBalls*/; i++) {
+		textureFilenames.push_back(_ballsMaterials[i].mapKd);
+	}
+
 	// carrega a textura de cada bola
-	for (int i = 0; i < _numberOfBalls; i++) {
-		PoolBalls::loadTexture(_ballsMaterials[i].mapKd);
+	for (int i = 0; i < 2/*_numberOfBalls*/; i++) {
+		PoolBalls::loadTextures(textureFilenames);
 	}
 
 	// gera nomes para os VAOs das bolas
@@ -306,6 +312,23 @@ void PoolBalls::init(void) {
 	// ativa o teste de profundidade
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+
+
+
+	/**************************************/
+	/*   PODE SER ÚTIL PARA AS TEXTURAS   */
+	/**************************************/
+
+	////glUniform1i(glGetUniformLocation(programa, "TextureSampler1"), 0 /* Unidade de Textura #0 */);
+	////glUniform1i(glGetUniformLocation(programa, "TextureSampler2"), 1 /* Unidade de Textura #1 */);
+
+	//// indicação da unidade de textura a ligar ao sampler 'TexSampler1'.
+	//GLint locationTextureSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "TexSampler1");
+	//glProgramUniform1i(_programShader, locationTextureSampler1, 0 /* Unidade de Textura #0 */);
+
+	//// indicação da unidade de textura a ligar ao sampler 'TexSampler2'.
+	//GLint locationTextureSampler2 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "TexSampler2");
+	//glProgramUniform1i(_programShader, locationTextureSampler2, 1 /* Unidade de Textura #1 */);
 }
 
 void PoolBalls::display(void) {
@@ -514,48 +537,55 @@ PoolBalls::Material PoolBalls::loadMaterial(const char* mtlFilename) {
 	return material;
 }
 
-void PoolBalls::loadTexture(std::string imageFilename) {
-	GLuint textureName = 0;
+void PoolBalls::loadTextures(std::vector<string> imageFilenames) {
+	GLuint textureName[2/*_numberOfBalls*/]{};
+	GLint texCount = 0;
 
-	// gera o nome para a textura da bola
-	glGenTextures(1, &textureName);
+	// gera nomes para as texturas
+	glGenTextures(2/*_numberOfBalls*/, textureName);
 
-	// ativa a unidade de textura #0
-	// (só uma Unidade de Textura está ativa a cada momento)
-	glActiveTexture(GL_TEXTURE0);
+	// lê cada imagem das texturas
+	for (auto filename : imageFilenames) {
+		// ativa a Unidade de Textura #(0 + texCount),
+		// a Unidade de Textura 0 está ativa por defeito,
+		// só uma Unidade de Textura pode estar ativa
+		glActiveTexture(GL_TEXTURE0 + texCount);
 
-	// vincula o nome de textura ao target GL_TEXTURE_2D da Unidade de textura ativa
-	glBindTexture(GL_TEXTURE_2D, textureName);
+		// vincula um nome de textura ao target GL_TEXTURE_2D da unidade de rextura ativa.
+		glBindTexture(GL_TEXTURE_2D, textureName[texCount++]);
 
-	// Define os parâmetros de filtragem (wrapping e ajuste de tamanho)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		// define os parâmetros de filtragem (wrapping e ajuste de tamanho),
+		// para a textura que está vinculada ao target GL_TEXTURE_2D da unidade de rextura ativa.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// valores da imagem
-	int width, height, nChannels;
+		// dados da imagem
+		int width, height, nChannels;
 
-	// ativa a inversão vertical da imagem, aquando da sua leitura para memória.
-	stbi_set_flip_vertically_on_load(true);
+		// ativa a inversão vertical da imagem, aquando da sua leitura para memória
+		stbi_set_flip_vertically_on_load(true);
 
-	// lê a imagem para memória do CPU
-	std::string directory = "textures/";
-	std::string fullPath = directory + imageFilename;
-	unsigned char* imageData = stbi_load(fullPath.c_str(), &width, &height, &nChannels, 0);
+		std::string directory = "textures/";
+		std::string fullPath = directory + filename;
+		unsigned char* imageData = stbi_load(fullPath.c_str(), &width, &height, &nChannels, 0);
 
-	if (!imageData) {
-		cout << "Erro ao carregar textura." << endl;
+		// se houve erros ao abrir o ficheiro
+		if (!imageData) {
+			cout << "Error loading texture!" << endl;
+			return;
+		}
+
+		// carrega os dados da imagem para o Objeto de Textura vinculado ao target GL_TEXTURE_2D da unidade de textura ativa.
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData);
+
+		// gera o mipmap para essa textura
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		// liberta a imagem da memória do CPU
+		stbi_image_free(imageData);
 	}
-
-	// carrega os dados da imagem para o objeto de Textura vinculado ao target GL_TEXTURE_2D da Unidade de Textura ativa.
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData);
-
-	// gera o mipmap para essa textura
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// liberta a imagem da memória do CPU
-	stbi_image_free(imageData);
 }
 
 #pragma endregion
