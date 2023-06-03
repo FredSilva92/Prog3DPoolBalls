@@ -34,7 +34,18 @@ namespace PoolBalls {
 
 #pragma region estruturas
 
-	// criar classe aqui...
+	// extrutura para armazenados dados dos ficheiros .mtl
+	typedef struct {
+		std::string newmtl;
+		float ns;
+		std::vector<float> ka;
+		std::vector<float> kd;
+		std::vector<float> ks;
+		float ni;
+		float d;
+		int illum;
+		std::string mapKd;
+	} Material;
 
 #pragma endregion
 
@@ -45,6 +56,7 @@ namespace PoolBalls {
 	void display(void);
 	std::vector<float> load3dModel(const char* objFilename);
 	std::string getMtlFromObj(const char* objFilename);
+	Material loadMaterial(std::string mtlFilename);
 
 #pragma endregion
 

@@ -45,6 +45,7 @@ const GLuint _numberOfBalls = 15;
 GLuint _ballsVAOs[_numberOfBalls];
 GLuint _ballsVBOs[_numberOfBalls];
 vector<vector<float>> _ballsVertices;
+vector<PoolBalls::Material> _ballsMaterials;
 
 // shaders
 GLuint _programShader;
@@ -195,6 +196,9 @@ void PoolBalls::init(void) {
 	for (int i = 1; i <= _numberOfBalls; i++) {
 		std::string objFilename = "textures/Ball" + to_string(i) + ".obj";
 		_ballsVertices.push_back(PoolBalls::load3dModel(objFilename.c_str()));
+
+		std::string mtlFilename = getMtlFromObj(objFilename.c_str());
+		_ballsMaterials.push_back(PoolBalls::loadMaterial(mtlFilename));
 	}
 
 	// gera nomes para os VAOs das bolas
@@ -390,48 +394,6 @@ std::vector<float> PoolBalls::load3dModel(const char* objFilename) {
 		}
 	}
 
-	std::string mtlFilename = getMtlFromObj(objFilename);
-	std::ifstream mtlFile("textures/" + mtlFilename);
-
-	// se houve erros ao carregar o ficheiro .mtl
-	if (!mtlFile) {
-		std::cerr << "Erro ao carregar ficheiro .mtl." << std::endl;
-		return {};
-	}
-
-	std::string line;
-	std::string materialName;
-	std::vector<float> texture;
-
-	while (std::getline(mtlFile, line)) {
-		// ignora linhas vazias ou comentadas
-		if (line.empty() || line[0] == '#') {
-			continue;
-		}
-
-		std::istringstream iss(line);
-		std::string command;
-		iss >> command;
-
-		if (command == "newmtl") {
-			// inicia um novo material
-			iss >> materialName;
-		}
-		else if (command == "Kd") {
-			// lê a cor difusa do material
-			float r, g, b;
-			iss >> r >> g >> b;
-
-			glm::vec3 diffuseColor = {
-				r,
-				g,
-				b
-			};
-
-			texture.push_back(diffuseColor);
-		}
-	}
-
 	return vertices;
 }
 
@@ -452,6 +414,98 @@ std::string PoolBalls::getMtlFromObj(const char* objFilename) {
 	}
 
 	return mtlFilename;
+}
+
+PoolBalls::Material PoolBalls::loadMaterial(std::string mtlFilename) {
+	std::ifstream mtlFile("textures/" + mtlFilename);
+
+	// se houve erros ao carregar o ficheiro .mtl
+	if (!mtlFile) {
+		std::cerr << "Erro ao carregar ficheiro .mtl." << std::endl;
+		return {};
+	}
+
+	std::string line;
+	std::string materialName;
+	PoolBalls::Material material;
+
+	// lê cada linha do ficheiro .mtl
+	while (std::getline(mtlFile, line)) {
+		// ignora linhas vazias ou comentadas
+		if (line.empty() || line[0] == '#') {
+			continue;
+		}
+
+		std::istringstream stream(line);
+		std::string command;
+		stream >> command;
+
+		// nome (cria um novo material)
+		if (command == "newmtl") {
+			string name;
+			stream >> name;
+
+			material.newmtl = name;
+		}
+		// coeficiente de especularidade
+		else if (command == "Ns") {
+			float value;
+			stream >> value;
+
+			material.ns = value;
+		}
+		// cor ambiente
+		else if (command == "Ka") {
+			float r, g, b;
+			stream >> r >> g >> b;
+
+			material.ka = { r, g, b };
+		}
+		// cor difusa
+		else if (command == "Kd") {
+			float r, g, b;
+			stream >> r >> g >> b;
+
+			material.kd = { r, g, b };
+		}
+		// cor especular
+		else if (command == "Ks") {
+			float r, g, b;
+			stream >> r >> g >> b;
+
+			material.ks = { r, g, b };
+		}
+		// índice de refração
+		else if (command == "Ni") {
+			float value;
+			stream >> value;
+
+			material.ni = value;
+		}
+		// índice de refração
+		else if (command == "d") {
+			float value;
+			stream >> value;
+
+			material.d = value;
+		}
+		// modelo de iluminação
+		else if (command == "illum") {
+			float value;
+			stream >> value;
+
+			material.illum = value;
+		}
+		// textura
+		else if (command == "map_Kd") {
+			string texture;
+			stream >> texture;
+
+			material.mapKd = texture;
+		}
+	}
+
+	return material;
 }
 
 #pragma endregion
