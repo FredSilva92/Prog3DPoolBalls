@@ -192,13 +192,18 @@ void PoolBalls::init(void) {
 	// desvincula o VAO atual
 	glBindVertexArray(0);
 
-	// carrega o modelo, material e textura de cada bola a partir de ficheiros externos
+	// carrega o modelo e material de cada bola
 	for (int i = 1; i <= _numberOfBalls; i++) {
 		std::string objFilename = "textures/Ball" + to_string(i) + ".obj";
 		_ballsVertices.push_back(PoolBalls::load3dModel(objFilename.c_str()));
 
 		std::string mtlFilename = getMtlFromObj(objFilename.c_str());
-		_ballsMaterials.push_back(PoolBalls::loadMaterial(mtlFilename));
+		_ballsMaterials.push_back(PoolBalls::loadMaterial(mtlFilename.c_str()));
+	}
+
+	// carrega a textura de cada bola
+	for (int i = 0; i < _numberOfBalls; i++) {
+		PoolBalls::loadTexture(_ballsMaterials[i].mapKd);
 	}
 
 	// gera nomes para os VAOs das bolas
@@ -416,8 +421,9 @@ std::string PoolBalls::getMtlFromObj(const char* objFilename) {
 	return mtlFilename;
 }
 
-PoolBalls::Material PoolBalls::loadMaterial(std::string mtlFilename) {
-	std::ifstream mtlFile("textures/" + mtlFilename);
+PoolBalls::Material PoolBalls::loadMaterial(const char* mtlFilename) {
+	std::string directory = "textures/";
+	std::ifstream mtlFile(directory + mtlFilename);
 
 	// se houve erros ao carregar o ficheiro .mtl
 	if (!mtlFile) {
@@ -442,7 +448,7 @@ PoolBalls::Material PoolBalls::loadMaterial(std::string mtlFilename) {
 
 		// nome (cria um novo material)
 		if (command == "newmtl") {
-			string name;
+			std::string name;
 			stream >> name;
 
 			material.newmtl = name;
@@ -498,7 +504,7 @@ PoolBalls::Material PoolBalls::loadMaterial(std::string mtlFilename) {
 		}
 		// textura
 		else if (command == "map_Kd") {
-			string texture;
+			std::string texture;
 			stream >> texture;
 
 			material.mapKd = texture;
@@ -506,6 +512,50 @@ PoolBalls::Material PoolBalls::loadMaterial(std::string mtlFilename) {
 	}
 
 	return material;
+}
+
+void PoolBalls::loadTexture(std::string imageFilename) {
+	GLuint textureName = 0;
+
+	// gera o nome para a textura da bola
+	glGenTextures(1, &textureName);
+
+	// ativa a unidade de textura #0
+	// (só uma Unidade de Textura está ativa a cada momento)
+	glActiveTexture(GL_TEXTURE0);
+
+	// vincula o nome de textura ao target GL_TEXTURE_2D da Unidade de textura ativa
+	glBindTexture(GL_TEXTURE_2D, textureName);
+
+	// Define os parâmetros de filtragem (wrapping e ajuste de tamanho)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	// valores da imagem
+	int width, height, nChannels;
+
+	// ativa a inversão vertical da imagem, aquando da sua leitura para memória.
+	stbi_set_flip_vertically_on_load(true);
+
+	// lê a imagem para memória do CPU
+	std::string directory = "textures/";
+	std::string fullPath = directory + imageFilename;
+	unsigned char* imageData = stbi_load(fullPath.c_str(), &width, &height, &nChannels, 0);
+
+	if (!imageData) {
+		cout << "Erro ao carregar textura." << endl;
+	}
+
+	// carrega os dados da imagem para o objeto de Textura vinculado ao target GL_TEXTURE_2D da Unidade de Textura ativa.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData);
+
+	// gera o mipmap para essa textura
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// liberta a imagem da memória do CPU
+	stbi_image_free(imageData);
 }
 
 #pragma endregion
