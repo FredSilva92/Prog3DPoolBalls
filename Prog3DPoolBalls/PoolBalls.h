@@ -8,8 +8,6 @@ namespace PoolBalls {
 #pragma region bibliotecas
 
 #include <iostream>
-#include <vector>
-	using namespace std;
 
 #define GLEW_STATIC
 #include <GL\glew.h>
@@ -45,7 +43,8 @@ namespace PoolBalls {
 
 	void init(void);
 	void display(void);
-	vector<float> loadTextures(const char* filename);
+	std::vector<float> load3dModel(const char* objFilename);
+	std::string getMtlFromObj(const char* objFilename);
 
 #pragma endregion
 

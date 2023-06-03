@@ -191,10 +191,10 @@ void PoolBalls::init(void) {
 	// desvincula o VAO atual
 	glBindVertexArray(0);
 
-	// carrega os atributos dos vértices de cada bola a partir de ficheiros .obj
+	// carrega o modelo, material e textura de cada bola a partir de ficheiros externos
 	for (int i = 1; i <= _numberOfBalls; i++) {
-		string filename = "textures/Ball" + to_string(i) + ".obj";
-		_ballsVertices.push_back(PoolBalls::loadTextures(filename.c_str()));
+		std::string objFilename = "textures/Ball" + to_string(i) + ".obj";
+		_ballsVertices.push_back(PoolBalls::load3dModel(objFilename.c_str()));
 	}
 
 	// gera nomes para os VAOs das bolas
@@ -345,25 +345,27 @@ void PoolBalls::display(void) {
 	}
 }
 
-vector<float> PoolBalls::loadTextures(const char* filename) {
-	vector<float> vertices;
+std::vector<float> PoolBalls::load3dModel(const char* objFilename) {
+	std::vector<float> vertices;
 
 	tinyobj::attrib_t attributes;
-	vector<tinyobj::shape_t> shapes;
-	vector<tinyobj::material_t> materials;
-	string warning, error;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::string warning, error;
 
-	if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warning, &error, filename)) {
-		cout << warning << error << '\n';
+	// se houve erros ao carregar o ficheiro .obj
+	if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warning, &error, objFilename)) {
+		std::cout << warning << error << '\n';
+		return {};
 	}
 
+	// lê atributos do modelo 3D
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
-			glm::vec4 pos = {
+			glm::vec3 position = {
 				attributes.vertices[index.vertex_index],
 				attributes.vertices[index.vertex_index + 1],
-				attributes.vertices[index.vertex_index + 2],
-				1
+				attributes.vertices[index.vertex_index + 2]
 			};
 
 			glm::vec3 normal = {
@@ -377,9 +379,9 @@ vector<float> PoolBalls::loadTextures(const char* filename) {
 				attributes.texcoords[index.texcoord_index + 1]
 			};
 
-			vertices.push_back(pos.x);
-			vertices.push_back(pos.y);
-			vertices.push_back(pos.z);
+			vertices.push_back(position.x);
+			vertices.push_back(position.y);
+			vertices.push_back(position.z);
 			vertices.push_back(normal.x);
 			vertices.push_back(normal.y);
 			vertices.push_back(normal.z);
@@ -388,8 +390,69 @@ vector<float> PoolBalls::loadTextures(const char* filename) {
 		}
 	}
 
+	std::string mtlFilename = getMtlFromObj(objFilename);
+	std::ifstream mtlFile("textures/" + mtlFilename);
+
+	// se houve erros ao carregar o ficheiro .mtl
+	if (!mtlFile) {
+		std::cerr << "Erro ao carregar ficheiro .mtl." << std::endl;
+		return {};
+	}
+
+	std::string line;
+	std::string materialName;
+	std::vector<float> texture;
+
+	while (std::getline(mtlFile, line)) {
+		// ignora linhas vazias ou comentadas
+		if (line.empty() || line[0] == '#') {
+			continue;
+		}
+
+		std::istringstream iss(line);
+		std::string command;
+		iss >> command;
+
+		if (command == "newmtl") {
+			// inicia um novo material
+			iss >> materialName;
+		}
+		else if (command == "Kd") {
+			// lê a cor difusa do material
+			float r, g, b;
+			iss >> r >> g >> b;
+
+			glm::vec3 diffuseColor = {
+				r,
+				g,
+				b
+			};
+
+			texture.push_back(diffuseColor);
+		}
+	}
+
 	return vertices;
-};
+}
+
+std::string PoolBalls::getMtlFromObj(const char* objFilename) {
+	std::ifstream file(objFilename);
+	std::string line;
+	std::string mtlFilename;
+
+	while (std::getline(file, line)) {
+		std::istringstream stream(line);
+		std::string prefix;
+		stream >> prefix;
+
+		if (prefix == "mtllib") {
+			stream >> mtlFilename;
+			break;
+		}
+	}
+
+	return mtlFilename;
+}
 
 #pragma endregion
 
