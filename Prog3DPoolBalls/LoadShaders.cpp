@@ -1,4 +1,4 @@
-﻿#pragma region bibliotecas
+﻿#pragma region importações
 
 #include <iostream>
 using namespace std;

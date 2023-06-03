@@ -3,9 +3,7 @@
 #ifndef POOL_BALLS_H
 #define POOL_BALLS_H 1
 
-namespace PoolBalls {
-
-#pragma region bibliotecas
+#pragma region importações
 
 #include <iostream>
 
@@ -23,6 +21,8 @@ namespace PoolBalls {
 #pragma endregion
 
 
+namespace PoolBalls {
+
 #pragma region constantes
 
 #define SCREEN_WIDTH 800
@@ -32,19 +32,22 @@ namespace PoolBalls {
 #pragma endregion
 
 
-#pragma region estruturas
+#pragma region classe base da biblioteca
+
+	class Renderer {
+	public:
+		void Read(const std::string obj_model_filepath);
+		void Send();
+		void Draw(glm::vec3 position, glm::vec3 orientation);
+	};
 
 	// estrutura para armazenados dados dos ficheiros .mtl
 	typedef struct {
-		std::string newmtl;
-		float ns;
-		glm::vec3 ka;
-		glm::vec3 kd;
-		glm::vec3 ks;
-		float ni;
-		float d;
-		int illum;
-		std::string mapKd;
+		float ns;			// expoente especular (brilho do objeto)
+		glm::vec3 ka;		// coeficiente de reflexão da luz ambiente
+		glm::vec3 kd;		// coeficiente de reflexão da luz difusa
+		glm::vec3 ks;		// coeficiente de reflexão da luz especular 
+		std::string map_kd;	// nome do ficheiro da imagem de textura
 	} Material;
 
 #pragma endregion
@@ -58,8 +61,8 @@ namespace PoolBalls {
 	std::string getMtlFromObj(const char* objFilename);
 	Material loadMaterial(const char* mtlFilename);
 	void loadTextures(std::vector<string> imageFilenames);
-	void loadLightingUniforms();
 	void loadMaterialUniforms(Material mt, glm::vec3 emissive);
+	void loadLightingUniforms();
 
 #pragma endregion
 

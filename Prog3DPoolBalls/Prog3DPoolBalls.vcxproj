@@ -138,8 +138,8 @@
   <ItemGroup>
     <ClInclude Include="LoadShaders.h" />
     <ClInclude Include="PoolBalls.h" />
-    <ClInclude Include="StbImage.h" />
-    <ClInclude Include="thirdParty\tiny_obj_loader.h" />
+    <ClInclude Include="thirdParty\StbImage.h" />
+    <ClInclude Include="thirdParty\TinyObjLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

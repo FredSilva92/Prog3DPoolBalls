@@ -43,10 +43,10 @@
     <ClInclude Include="PoolBalls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="thirdParty\tiny_obj_loader.h">
+    <ClInclude Include="thirdParty\TinyObjLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StbImage.h">
+    <ClInclude Include="thirdParty\StbImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

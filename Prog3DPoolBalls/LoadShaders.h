@@ -3,7 +3,7 @@
 #ifndef LOAD_SHADERS_H
 #define LOAD_SHADERS_H 1
 
-#pragma region bibliotecas
+#pragma region importações
 
 #include <GL\gl.h>
 

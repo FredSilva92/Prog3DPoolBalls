@@ -1,4 +1,4 @@
-﻿#pragma region bibliotecas
+﻿#pragma region importações
 
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "glfw3.lib")
