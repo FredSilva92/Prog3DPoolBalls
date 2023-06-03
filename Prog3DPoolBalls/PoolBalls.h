@@ -38,9 +38,9 @@ namespace PoolBalls {
 	typedef struct {
 		std::string newmtl;
 		float ns;
-		std::vector<float> ka;
-		std::vector<float> kd;
-		std::vector<float> ks;
+		glm::vec3 ka;
+		glm::vec3 kd;
+		glm::vec3 ks;
 		float ni;
 		float d;
 		int illum;
@@ -58,6 +58,8 @@ namespace PoolBalls {
 	std::string getMtlFromObj(const char* objFilename);
 	Material loadMaterial(const char* mtlFilename);
 	void loadTextures(std::vector<string> imageFilenames);
+	void loadLightingUniforms();
+	void loadMaterialUniforms(Material mt, glm::vec3 emissive);
 
 #pragma endregion
 

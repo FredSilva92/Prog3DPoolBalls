@@ -87,39 +87,23 @@ void main()
 	// C�lculo da componente emissiva do material.
 	vec4 emissive = vec4(material.emissive, 1.0);
 
-	// C�lculo do efeito da ilumina��o no fragmento.
-	vec4 light[5];
-	// Contribui��o da fonte de luz ambiente
-	light[0] = calcAmbientLight(ambientLight);
-	// Contribui��o da fonte de luz direcional
-	light[1] = calcDirectionalLight(directionalLight);
+	vec4 lightToUse;
 
-	light[2] = calcPointLight(pointLight);
-	// Contribui��o de cada fonte de luz Pontual
-	/*	for(int i=0; i<2; i++)
-		light[i+2] = calcPointLight(pointLight[i]);
-	// Contribui��o da fonte de luz c�nica
-	light[4] = vec4(0.0);*/
-
-	// C�lculo da cor final do fragmento.
-	// Com CubeMap
-	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * texture(cubeMap, textureVector);
-	// Com cor de fragmento
-	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * vec4(1.0, 0.5, 0.5, 1.0);
-	/*
-	if (lightModel == 1) {
-		fColor = light[0] * vec4(color, 1.0f);
-	} else {
-		fColor = light[1] * vec4(color, 1.0f);
-	}*/
-
-	//fColor = vec4(color, 1.0f);
+	if (lightModel == 2) {
+		lightToUse = calcDirectionalLight(directionalLight);
+	} else if (lightModel == 3) {
+		lightToUse = calcPointLight(pointLight);;
+	} /*else if (lightModel == 4) {
+		
+	}*/ else {
+		lightToUse = calcAmbientLight(ambientLight);
+	}
 
 	if (renderTex == 1) {
 		vec4 texColor = texture(sampler, textureCoord);
-		fColor = texColor;
+		fColor = (emissive + lightToUse) * texColor;
 	} else {
-		fColor = vec4(color, 1.0f);
+		fColor = (emissive + lightToUse) * vec4(color, 1.0f);
 	}
 
 }
