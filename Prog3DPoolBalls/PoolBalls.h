@@ -34,7 +34,7 @@ namespace PoolBalls {
 
 #pragma region estruturas
 
-	// extrutura para armazenados dados dos ficheiros .mtl
+	// estrutura para armazenados dados dos ficheiros .mtl
 	typedef struct {
 		std::string newmtl;
 		float ns;

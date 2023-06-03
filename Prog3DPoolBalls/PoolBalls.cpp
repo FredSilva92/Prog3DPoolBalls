@@ -207,15 +207,13 @@ void PoolBalls::init(void) {
 		textureFilenames.push_back(_ballsMaterials[i].mapKd);
 	}
 
-	// carrega a textura de cada bola
-	for (int i = 0; i < _numberOfBalls/*_numberOfBalls*/; i++) {
-		PoolBalls::loadTextures(textureFilenames);
-	}
+	// carrega as texturas para cada bola
+	PoolBalls::loadTextures(textureFilenames);
 
 	// gera nomes para os VAOs das bolas
 	glGenVertexArrays(_numberOfBalls, _ballsVAOs);
 
-	// vincula cada VAO das bolas ao contexto OpenGL atual
+	// vincula o VAO de cada bola ao contexto OpenGL atual
 	for (int i = 0; i < _numberOfBalls; i++) {
 		glBindVertexArray(_ballsVAOs[i]);
 	}
@@ -314,8 +312,6 @@ void PoolBalls::init(void) {
 	// ativa o teste de profundidade
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
-
 }
 
 void PoolBalls::display(void) {
@@ -324,7 +320,6 @@ void PoolBalls::display(void) {
 
 	// translação da mesa
 	glm::mat4 translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
-	
 
 	// modelo de visualização do objeto
 	glm::mat4 modelView = _view * translatedModel;
@@ -346,40 +341,35 @@ void PoolBalls::display(void) {
 
 	loadMaterialUniforms(mt, glm::vec3(0));
 
-
 	// desenha a mesa na tela
 	glBindVertexArray(_tableVAO);
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
 
-	
-	
-	
+	// posições das bolas
 	std::vector<glm::vec3> _ballPositions = {
-	glm::vec3(1.1f, 0.33f, 1.1f),  // Position for ball 1
-	glm::vec3(-1.1f, 0.33f, -1.1f),  // Position for ball 2
-	glm::vec3(-1.1f, 0.33f, 1.1f),  // Position for ball 3
-	glm::vec3(1.1f, 0.33f, -1.1f),  // Position for ball 4
-	glm::vec3(0.1f, 0.33f, -0.1f),  // Position for ball 5
-	glm::vec3(-0.3f, 0.33f, -0.3f),  // Position for ball 6
-	glm::vec3(-0.6f, 0.33f, -0.4f),  // Position for ball 7
-	glm::vec3(0.8f, 0.33f, 0.7f),  // Position for ball 8
-	glm::vec3(-0.8f, 0.33f, -0.2f),  // Position for ball 9
-	glm::vec3(0.3f, 0.33f, 0.7f),  // Position for ball 10
-	glm::vec3(-0.2f, 0.33f, -0.8f),  // Position for ball 11
-	glm::vec3(0.7f, 0.33f, 0.5f),  // Position for ball 12
-	glm::vec3(-0.9f, 0.33f, 0.6f),  // Position for ball 13
-	glm::vec3(0.1f, 0.33f, 0.3f),  // Position for ball 14
-	glm::vec3(0.4f, 0.33f, -0.6f),  // Position for ball 15
-	
+		glm::vec3(1.1f, 0.33f, 1.1f),		// bola 1
+		glm::vec3(-1.1f, 0.33f, -1.1f),		// bola 2
+		glm::vec3(-1.1f, 0.33f, 1.1f),		// bola 3
+		glm::vec3(1.1f, 0.33f, -1.1f),		// bola 4
+		glm::vec3(0.1f, 0.33f, -0.1f),		// bola 5
+		glm::vec3(-0.3f, 0.33f, -0.3f),		// bola 6
+		glm::vec3(-0.6f, 0.33f, -0.4f),		// bola 7
+		glm::vec3(0.8f, 0.33f, 0.7f),		// bola 8
+		glm::vec3(-0.8f, 0.33f, -0.2f),		// bola 9
+		glm::vec3(0.3f, 0.33f, 0.7f),		// bola 10
+		glm::vec3(-0.2f, 0.33f, -0.8f),		// bola 11
+		glm::vec3(0.7f, 0.33f, 0.5f),		// bola 12
+		glm::vec3(-0.9f, 0.33f, 0.6f),		// bola 13
+		glm::vec3(0.1f, 0.33f, 0.3f),		// bola 14
+		glm::vec3(0.4f, 0.33f, -0.6f),		// bola 15
 	};
-
-
 
 	// para cada bola
 	for (int i = 0; i < _ballsVertices.size(); i++) {
 		// translação da mesa
 		translatedModel = glm::translate(_model, _ballPositions[i]);
 
+		// escala de cada bola
 		glm::mat4 scaledModel = glm::scale(translatedModel, glm::vec3(0.08f));
 
 		// modelo de visualização do objeto
@@ -434,8 +424,8 @@ std::vector<float> PoolBalls::load3dModel(const char* objFilename) {
 			};
 
 			glm::vec2 textCoord = {
-				attributes.texcoords[2 *index.texcoord_index],
-				attributes.texcoords[2 *index.texcoord_index + 1]
+				attributes.texcoords[2 * index.texcoord_index],
+				attributes.texcoords[2 * index.texcoord_index + 1]
 			};
 
 			vertices.push_back(pos.x);
@@ -565,24 +555,21 @@ PoolBalls::Material PoolBalls::loadMaterial(const char* mtlFilename) {
 }
 
 void PoolBalls::loadTextures(std::vector<string> imageFilenames) {
-	GLuint textureName[2/*_numberOfBalls*/]{};
-	GLint texCount = 0;
+	GLuint textureName[_numberOfBalls];
+	GLint textureCount = 0;
 
 	// gera nomes para as texturas
-	glGenTextures(2/*_numberOfBalls*/, textureName);
+	glGenTextures(_numberOfBalls, textureName);
 
 	// lê cada imagem das texturas
 	for (auto filename : imageFilenames) {
-		// ativa a Unidade de Textura #(0 + texCount),
-		// a Unidade de Textura 0 está ativa por defeito,
-		// só uma Unidade de Textura pode estar ativa
-		glActiveTexture(GL_TEXTURE0 + texCount);
+		// ativa a unidade de textura atual (inicia na unidade 0)
+		glActiveTexture(GL_TEXTURE0 + textureCount);
 
-		// vincula um nome de textura ao target GL_TEXTURE_2D da unidade de rextura ativa.
-		glBindTexture(GL_TEXTURE_2D, textureName[texCount++]);
+		// vincula um nome de textura ao target GL_TEXTURE_2D da unidade de rextura ativa
+		glBindTexture(GL_TEXTURE_2D, textureName[textureCount++]);
 
-		// define os parâmetros de filtragem (wrapping e ajuste de tamanho),
-		// para a textura que está vinculada ao target GL_TEXTURE_2D da unidade de rextura ativa.
+		// define os parâmetros de filtragem (wrapping e ajuste de tamanho)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -594,6 +581,7 @@ void PoolBalls::loadTextures(std::vector<string> imageFilenames) {
 		// ativa a inversão vertical da imagem, aquando da sua leitura para memória
 		stbi_set_flip_vertically_on_load(true);
 
+		// lê o ficheiro da imagem
 		std::string directory = "textures/";
 		std::string fullPath = directory + filename;
 		unsigned char* imageData = stbi_load(fullPath.c_str(), &width, &height, &nChannels, 0);
@@ -604,7 +592,7 @@ void PoolBalls::loadTextures(std::vector<string> imageFilenames) {
 			return;
 		}
 
-		// carrega os dados da imagem para o Objeto de Textura vinculado ao target GL_TEXTURE_2D da unidade de textura ativa.
+		// carrega os dados da imagem para o objeto de textura vinculado ao target GL_TEXTURE_2D da unidade de textura ativa
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData);
 
 		// gera o mipmap para essa textura
@@ -683,38 +671,39 @@ void PoolBalls::charCallback(GLFWwindow* window, unsigned int codepoint)
 	{
 	case '1':
 		lightModel = 1;
-		std::cout << "Luz ambiente ativada" << std::endl;
+		std::cout << "Luz ambiente ativada." << std::endl;
 		break;
 	case '2':
 		lightModel = 2;
-		std::cout << "Luz direcional ativada" << std::endl;
+		std::cout << "Luz direcional ativada." << std::endl;
 		break;
 	case '3':
 		lightModel = 3;
-		std::cout << "Luz pontual ativada" << std::endl;
+		std::cout << "Luz pontual ativada." << std::endl;
 		break;
 	case '4':
 		lightModel = 4;
-		std::cout << "Luz cónica ativada" << std::endl;
+		std::cout << "Luz cónica ativada." << std::endl;
 		break;
 	default:
 		lightModel = 1;
 		break;
 	}
+
 	glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
 }
 
 void PoolBalls::loadLightingUniforms() {
-	// Fonte de luz ambiente global
+	// fonte de luz ambiente global
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.5)));
 
-	// Fonte de luz direcional
+	// fonte de luz direcional
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0, 0.0, 0.0)));
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(0.2, 0.2, 0.2)));
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
 
-	// Fonte de luz pontual 
+	// fonte de luz pontual 
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(-2.0, 2.0, 5.0)));
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(0.1, 0.1, 0.1)));
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));

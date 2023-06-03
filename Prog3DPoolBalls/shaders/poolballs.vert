@@ -22,7 +22,7 @@ void main()
     gl_Position = Projection * ModelView * vec4(vPosition, 1.0);
     color = vColors;
 
-    	// Posição do vértice em coordenadas do olho.
+    // Posição do vértice em coordenadas do olho.
 	vPositionEyeSpace = (ModelView * vec4(vPosition, 1.0)).xyz;
 
 	// Transformar a normal do vértice.
