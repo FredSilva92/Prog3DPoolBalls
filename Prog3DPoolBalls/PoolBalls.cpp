@@ -203,12 +203,12 @@ void PoolBalls::init(void) {
 
 	// guarda os nomes dos ficheiros das texturas
 	vector<string> textureFilenames;
-	for (int i = 0; i < 2/*_numberOfBalls*/; i++) {
+	for (int i = 0; i < _numberOfBalls/*_numberOfBalls*/; i++) {
 		textureFilenames.push_back(_ballsMaterials[i].mapKd);
 	}
 
 	// carrega a textura de cada bola
-	for (int i = 0; i < 2/*_numberOfBalls*/; i++) {
+	for (int i = 0; i < _numberOfBalls/*_numberOfBalls*/; i++) {
 		PoolBalls::loadTextures(textureFilenames);
 	}
 
@@ -299,6 +299,32 @@ void PoolBalls::init(void) {
 	GLint projectionId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "Projection");
 	GLint normalViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "NormalMatrix");
 
+
+
+	// Fonte de luz ambiente global
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(0.1, 0.1, 0.1)));
+
+	// Fonte de luz direcional
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0, 0.0, 0.0)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(0.2, 0.2, 0.2)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+
+	// Fonte de luz pontual 
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(-2.0, 2.0, 5.0)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(0.1, 0.1, 0.1)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
+
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.emissive"), 1, glm::value_ptr(glm::vec3(0.0, 0.0, 0.0)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.ambient"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.shininess"), 12.0f);
+
 	// atribui o valor aos uniforms do programa shader
 	glProgramUniformMatrix4fv(_programShader, modelId, 1, GL_FALSE, glm::value_ptr(_model));
 	glProgramUniformMatrix4fv(_programShader, viewId, 1, GL_FALSE, glm::value_ptr(_view));
@@ -337,6 +363,7 @@ void PoolBalls::display(void) {
 
 	// translação da mesa
 	glm::mat4 translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
+	
 
 	// modelo de visualização do objeto
 	glm::mat4 modelView = _view * translatedModel;
@@ -346,6 +373,10 @@ void PoolBalls::display(void) {
 
 	// atribui o valor ao uniform
 	glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
+
+	GLint renderTex = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "renderTex");
+	glProgramUniform1i(_programShader, renderTex, 0);
+
 
 	// desenha a mesa na tela
 	glBindVertexArray(_tableVAO);
@@ -391,9 +422,13 @@ void PoolBalls::display(void) {
 		// atribui o valor ao uniform
 		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
+		GLint locationTexSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "sampler");
+		glProgramUniform1i(_programShader, locationTexSampler1, i /* Unidade de Textura #0 */);
+		glProgramUniform1i(_programShader, renderTex, 1);
+
 		// desenha a bola na tela
 		glBindVertexArray(0);
-		glDrawArrays(GL_POINTS, 0, _ballsVertices[i].size() / 8);
+		glDrawArrays(GL_TRIANGLES, 0, _ballsVertices[i].size() / 8);
 	}
 }
 
@@ -414,26 +449,27 @@ std::vector<float> PoolBalls::load3dModel(const char* objFilename) {
 	// lê atributos do modelo 3D
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
-			glm::vec3 position = {
-				attributes.vertices[index.vertex_index],
-				attributes.vertices[index.vertex_index + 1],
-				attributes.vertices[index.vertex_index + 2]
+			glm::vec4 pos = {
+				attributes.vertices[3 * index.vertex_index],
+				attributes.vertices[3 * index.vertex_index + 1],
+				attributes.vertices[3 * index.vertex_index + 2],
+				1
 			};
 
 			glm::vec3 normal = {
-				attributes.normals[index.normal_index],
-				attributes.normals[index.normal_index + 1],
-				attributes.normals[index.normal_index + 2]
+				attributes.normals[3 * index.normal_index],
+				attributes.normals[3 * index.normal_index + 1],
+				attributes.normals[3 * index.normal_index + 2]
 			};
 
 			glm::vec2 textCoord = {
-				attributes.texcoords[index.texcoord_index],
-				attributes.texcoords[index.texcoord_index + 1]
+				attributes.texcoords[2 *index.texcoord_index],
+				attributes.texcoords[2 *index.texcoord_index + 1]
 			};
 
-			vertices.push_back(position.x);
-			vertices.push_back(position.y);
-			vertices.push_back(position.z);
+			vertices.push_back(pos.x);
+			vertices.push_back(pos.y);
+			vertices.push_back(pos.z);
 			vertices.push_back(normal.x);
 			vertices.push_back(normal.y);
 			vertices.push_back(normal.z);
@@ -669,24 +705,32 @@ void PoolBalls::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 
 void PoolBalls::charCallback(GLFWwindow* window, unsigned int codepoint)
 {
+	int lightModel;
+
 	// deteta as teclas do teclado
 	switch (codepoint)
 	{
 	case '1':
+		lightModel = 1;
 		std::cout << "Luz ambiente ativada" << std::endl;
 		break;
 	case '2':
+		lightModel = 2;
 		std::cout << "Luz direcional ativada" << std::endl;
 		break;
 	case '3':
+		lightModel = 3;
 		std::cout << "Luz pontual ativada" << std::endl;
 		break;
 	case '4':
+		lightModel = 4;
 		std::cout << "Luz cónica ativada" << std::endl;
 		break;
 	default:
+		lightModel = 1;
 		break;
 	}
+	glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
 }
 
 #pragma endregion

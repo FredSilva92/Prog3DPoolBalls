@@ -7,6 +7,10 @@ layout(location = 2) in vec2 vTextureCoords;
 layout(location = 0) out vec3 color;
 layout(location = 1) out vec2 textureCoord;
 
+layout(location = 2) out vec3 vPositionEyeSpace;
+layout(location = 3) out vec3 vNormalEyeSpace;
+layout(location = 4) out vec3 textureVector;
+
 uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 ModelView;		// View * Model
@@ -17,5 +21,12 @@ void main()
 {
     gl_Position = Projection * ModelView * vec4(vPosition, 1.0);
     color = vColors;
+
+    	// Posição do vértice em coordenadas do olho.
+	vPositionEyeSpace = (ModelView * vec4(vPosition, 1.0)).xyz;
+
+	// Transformar a normal do vértice.
+	vNormalEyeSpace = normalize(NormalMatrix * vColors);
+
 	textureCoord = vTextureCoords;
 }
