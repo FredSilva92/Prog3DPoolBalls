@@ -138,6 +138,7 @@
   <ItemGroup>
     <ClInclude Include="LoadShaders.h" />
     <ClInclude Include="PoolBalls.h" />
+    <ClInclude Include="Source.h" />
     <ClInclude Include="thirdParty\StbImage.h" />
     <ClInclude Include="thirdParty\TinyObjLoader.h" />
   </ItemGroup>

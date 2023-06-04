@@ -1,7 +1,6 @@
 ﻿#pragma region importações
 
 #include <iostream>
-using namespace std;
 #include <fstream>
 
 #define GLEW_STATIC
@@ -16,19 +15,19 @@ using namespace std;
 
 static const GLchar* readShader(const char* filename) {
 	// abre o ficheiro em modo binário e coloca-se na última posição do ficheiro
-	ifstream ficheiro(filename, ifstream::ate | ifstream::binary);
+	std::ifstream ficheiro(filename, std::ifstream::ate | std::ifstream::binary);
 
 	// se houve erros ao abrir o ficheiro
 	if (!ficheiro.is_open()) {
-		cerr << "Erro ao abrir o ficheiro '" << filename << "'" << endl;
+		std::cerr << "Erro ao abrir o ficheiro '" << filename << "'" << std::endl;
 		return nullptr;
 	}
 
 	// tamanho do ficheiro (por isso a vantagem de iniciar na última posição)
-	streampos fileLengthInBytes = ficheiro.tellg();
+	std::streampos fileLengthInBytes = ficheiro.tellg();
 
 	// reposiciona a leitura do ficheiro no início
-	ficheiro.seekg(0, ios::beg);
+	ficheiro.seekg(0, std::ios::beg);
 
 	// aloca memória para os dados do ficheiro
 	GLchar* source = new GLchar[int(fileLengthInBytes) + 1];
@@ -98,7 +97,7 @@ GLuint loadShaders(ShaderInfo* shaders) {
 			// texto da mensagem do log
 			GLchar* log = new GLchar[length + 1];
 			glGetShaderInfoLog(shaders[i].shader, length, &length, log);
-			cerr << "Erro ao compilar shaders: " << log << endl;
+			std::cerr << "Erro ao compilar shaders: " << log << std::endl;
 			delete[] log;
 
 			// destroi os shaders criados
@@ -134,7 +133,7 @@ GLuint loadShaders(ShaderInfo* shaders) {
 		// texto da mensagem do log
 		GLchar* log = new GLchar[length + 1];
 		glGetProgramInfoLog(program, length, &length, log);
-		cerr << "Erro ao linkar shaders: " << log << endl;
+		std::cerr << "Erro ao linkar shaders: " << log << std::endl;
 		delete[] log;
 
 		// destroi os shaders criados
