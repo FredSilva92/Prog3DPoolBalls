@@ -45,19 +45,44 @@ namespace PoolBalls {
 
 	// classe base da biblioteca
 	class RendererBalls {
-	public:
+	private:
 		// atributos
 		const GLuint _numberOfBalls;
+		std::vector<std::vector<float>> _ballsVertices;
 		GLuint* _ballsVAOs;
 		GLuint* _ballsVBOs;
-		std::vector<std::vector<float>> _ballsVertices;
 		std::vector<Material> _ballsMaterials;
 		std::vector<Texture> _ballsTextures;
+		GLuint _programShader;
+
+	public:
+		// aceder atributos fora da classe - getters
+		GLuint getNumberOfBalls() const {
+			return _numberOfBalls;
+		}
+
+		const std::vector<std::vector<float>>& getBallsVertices() const {	// retorna apontador para ser mais eficiente no draw
+			return _ballsVertices;
+		}
+
+		const std::vector<Material>& getBallsMaterials() const {
+			return _ballsMaterials;
+		}
+
+		GLuint getProgramShader() const {
+			return _programShader;
+		}
+
+		// aceder atributos fora da classe - setters
+		void setProgramShader(GLuint programShader) {
+			_programShader = programShader;
+		}
 
 		// construtor
 		RendererBalls(GLuint numberOfBalls) : _numberOfBalls(numberOfBalls) {
 			_ballsVAOs = new GLuint[_numberOfBalls];
 			_ballsVBOs = new GLuint[_numberOfBalls];
+			_programShader = -1;
 		}
 
 		// destrutor
@@ -79,8 +104,8 @@ namespace PoolBalls {
 		std::string getMtlFromObj(const char* objFilepath);
 		Material loadMaterial(const char* mtlFilename);
 		Texture loadTexture(std::string imageFilename);
-		void loadMaterialUniforms(GLuint programShader, Material material, glm::vec3 emissive);
-		void loadLightingUniforms(GLuint programShader);
+		void loadLightingUniforms();
+		void loadMaterialUniforms(Material material, glm::vec3 emissive);
 	};
 
 #pragma endregion

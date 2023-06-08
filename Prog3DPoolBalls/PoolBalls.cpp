@@ -126,10 +126,10 @@ namespace PoolBalls {
 			// ativa atributos das coordenadas de textura dos vértices
 			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
 			glEnableVertexAttribArray(2);
-		}
 
-		// desvincula o VAO atual
-		glBindVertexArray(0);
+			// desvincula o VAO atual
+			glBindVertexArray(0);
+		}
 
 		// gera nomes para as texturas
 		std::vector<GLuint> textureNames(_numberOfBalls);
@@ -300,7 +300,7 @@ namespace PoolBalls {
 	}
 
 	Texture RendererBalls::loadTexture(std::string imageFilename) {
-		Texture texture;
+		Texture texture{};
 		int width, height, nChannels;
 
 		// lê o ficheiro da imagem
@@ -331,34 +331,34 @@ namespace PoolBalls {
 		return texture;
 	}
 
-	void RendererBalls::loadMaterialUniforms(GLuint programShader, Material material, glm::vec3 emissive) {
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.emissive"), 1, glm::value_ptr(emissive));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.ambient"), 1, glm::value_ptr(material.ka));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.diffuse"), 1, glm::value_ptr(material.kd));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.specular"), 1, glm::value_ptr(material.ks));
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.shininess"), material.ns);
-	}
-
-	void RendererBalls::loadLightingUniforms(GLuint programShader) {
+	void RendererBalls::loadLightingUniforms() {
 		// fonte de luz ambiente global
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.5)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.5)));
 
 		// fonte de luz direcional
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0, 0.0, 0.0)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(0.2, 0.2, 0.2)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0, 0.0, 0.0)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(0.2, 0.2, 0.2)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
 
 		// fonte de luz pontual 
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(-2.0, 2.0, 5.0)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(0.1, 0.1, 0.1)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(-2.0, 2.0, 5.0)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(0.1, 0.1, 0.1)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
 
-		glProgramUniform1i(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "lightModel"), 1);
+		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), 1);
+	}
+
+	void RendererBalls::loadMaterialUniforms(Material material, glm::vec3 emissive) {
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.emissive"), 1, glm::value_ptr(emissive));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.ambient"), 1, glm::value_ptr(material.ka));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.diffuse"), 1, glm::value_ptr(material.kd));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.specular"), 1, glm::value_ptr(material.ks));
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "material.shininess"), material.ns);
 	}
 
 #pragma endregion

@@ -36,8 +36,7 @@ GLuint _tableVAO;
 GLuint _tableVBO;
 
 // bolas
-const GLuint _numberOfBalls = 15;
-PoolBalls::RendererBalls rendererBalls(_numberOfBalls);
+PoolBalls::RendererBalls _rendererBalls(15);
 
 // shaders
 GLuint _programShader;
@@ -247,15 +246,15 @@ void init(void) {
 	glEnableVertexAttribArray(2);
 
 	// desvincula o VAO atual
-	glBindVertexArray(0);
+	glBindVertexArray(_tableVAO);
 
 	// carrega o modelo, material e textura de cada bola
-	for (int i = 1; i <= rendererBalls._numberOfBalls; i++) {
+	for (int i = 1; i <= _rendererBalls.getNumberOfBalls(); i++) {
 		std::string objFilepath = "textures/Ball" + std::to_string(i) + ".obj";
-		rendererBalls.Read(objFilepath);
+		_rendererBalls.Read(objFilepath);
 	}
 
-	rendererBalls.Send();
+	_rendererBalls.Send();
 
 	// cria informações dos shaders
 	ShaderInfo shaders[] = {
@@ -309,8 +308,6 @@ void init(void) {
 	GLint projectionId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "Projection");
 	GLint normalViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "NormalMatrix");
 
-	rendererBalls.loadLightingUniforms(_programShader);
-
 	// atribui o valor aos uniforms do programa shader
 	glProgramUniformMatrix4fv(_programShader, modelId, 1, GL_FALSE, glm::value_ptr(_model));
 	glProgramUniformMatrix4fv(_programShader, viewId, 1, GL_FALSE, glm::value_ptr(_view));
@@ -318,10 +315,14 @@ void init(void) {
 	glProgramUniformMatrix4fv(_programShader, projectionId, 1, GL_FALSE, glm::value_ptr(_projection));
 	glProgramUniformMatrix3fv(_programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(_normalMatrix));
 
+	_rendererBalls.setProgramShader(_programShader);
+
+	_rendererBalls.loadLightingUniforms();
+
 	// define a janela de renderização
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	// ativa o teste de profundidade
+	// ativa o teste de profundidade e o descarte de polígonos não observáveis
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 }
@@ -344,14 +345,6 @@ void display(void) {
 
 	GLint renderTex = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "renderTex");
 	glProgramUniform1i(_programShader, renderTex, 0);
-
-	PoolBalls::Material material;
-	material.ka = glm::vec3(1.0, 1.0, 1.0);
-	material.kd = glm::vec3(1.0, 1.0, 1.0);
-	material.ks = glm::vec3(1.0, 1.0, 1.0);
-	material.ns = 12.0f;
-
-	rendererBalls.loadMaterialUniforms(_programShader, material, glm::vec3(0));
 
 	// desenha a mesa na tela
 	glBindVertexArray(_tableVAO);
@@ -376,9 +369,17 @@ void display(void) {
 		glm::vec3(0.4f, 0.33f, -0.6f),		// bola 15
 	};
 
-	// para cada bola
-	for (int i = 0; i < rendererBalls._ballsVertices.size(); i++) {
-		// translação da mesa
+	PoolBalls::Material material;
+	material.ka = glm::vec3(1.0, 1.0, 1.0);
+	material.kd = glm::vec3(1.0, 1.0, 1.0);
+	material.ks = glm::vec3(1.0, 1.0, 1.0);
+	material.ns = 12.0f;
+
+	_rendererBalls.loadMaterialUniforms(material, glm::vec3(0));
+
+	// desenha para cada bola
+	for (int i = 0; i < _rendererBalls.getNumberOfBalls(); i++) {
+		// translação da bola
 		translatedModel = glm::translate(_model, _ballPositions[i]);
 
 		// escala de cada bola
@@ -387,6 +388,8 @@ void display(void) {
 		// modelo de visualização do objeto
 		modelView = _view * scaledModel;
 
+		//_rendererBalls.Draw(_ballPositions[i], glm::vec3(0));
+
 		// obtém a localização do uniform
 		modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
 
@@ -394,14 +397,14 @@ void display(void) {
 		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
 		GLint locationTexSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "sampler");
-		glProgramUniform1i(_programShader, locationTexSampler1, i /* Unidade de Textura #0 */);
+		glProgramUniform1i(_programShader, locationTexSampler1, i /*unidade de textura*/);
 		glProgramUniform1i(_programShader, renderTex, 1);
 
-		rendererBalls.loadMaterialUniforms(_programShader, rendererBalls._ballsMaterials[i], glm::vec3(0.2));
+		_rendererBalls.loadMaterialUniforms(_rendererBalls.getBallsMaterials()[i], glm::vec3(0.2));
 
 		// desenha a bola na tela
 		glBindVertexArray(0);
-		glDrawArrays(GL_TRIANGLES, 0, rendererBalls._ballsVertices[i].size() / 8);
+		glDrawArrays(GL_TRIANGLES, 0, _rendererBalls.getBallsVertices()[i].size() / 8);
 	}
 }
 
