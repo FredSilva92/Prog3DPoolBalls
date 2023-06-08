@@ -350,6 +350,18 @@ namespace PoolBalls {
 		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
 		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
 
+		// fonte de luz conica
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.position"), 1, glm::value_ptr(glm::vec3(1.0, 0.0, 0.0)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.direction"), 1, glm::value_ptr(glm::vec3(0.2, 0.2, 0.2)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.ambient"), 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.5)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+		glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.specular"), 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.constant"), 1.0f);
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.linear"), 0.06f);
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.quadratic"), 0.02f);
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.cutoff"), 1.1f);
+		glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.outerCutOff"), 1.4f);
+
 		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), 1);
 	}
 

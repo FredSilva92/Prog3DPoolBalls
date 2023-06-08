@@ -10,6 +10,7 @@ layout(location = 1) out vec2 textureCoord;
 layout(location = 2) out vec3 vPositionEyeSpace;
 layout(location = 3) out vec3 vNormalEyeSpace;
 layout(location = 4) out vec3 textureVector;
+layout(location = 5) out vec3 fragPos;
 
 uniform mat4 Model;
 uniform mat4 View;
@@ -27,6 +28,8 @@ void main()
 
 	// Transformar a normal do vértice.
 	vNormalEyeSpace = normalize(NormalMatrix * vColors);
+
+	fragPos = vec3(Model * vec4(vPosition, 1.0f));
 
 	textureCoord = vTextureCoords;
 }
