@@ -56,6 +56,28 @@ float _zoomLevel = 1.0f;
 float _minZoom = 0.1f;
 float _maxZoom = 10.0f;
 float _zoomSpeed = 0.1f;
+bool _animationStarted = false;
+
+int animatedballIndex = 4;
+
+// posições das bolas
+std::vector<glm::vec3> _ballPositions = {
+	glm::vec3(1.1f, 0.33f, 1.1f),		// bola 1
+	glm::vec3(-1.1f, 0.33f, -1.1f),		// bola 2
+	glm::vec3(-1.1f, 0.33f, 1.1f),		// bola 3
+	glm::vec3(1.1f, 0.33f, -1.1f),		// bola 4
+	glm::vec3(0.1f, 0.33f, -0.1f),		// bola 5
+	glm::vec3(-0.3f, 0.33f, -0.3f),		// bola 6
+	glm::vec3(-0.6f, 0.33f, -0.4f),		// bola 7
+	glm::vec3(0.8f, 0.33f, 0.7f),		// bola 8
+	glm::vec3(-0.8f, 0.33f, -0.2f),		// bola 9
+	glm::vec3(0.3f, 0.33f, 0.7f),		// bola 10
+	glm::vec3(-0.2f, 0.33f, -0.8f),		// bola 11
+	glm::vec3(0.7f, 0.33f, 0.5f),		// bola 12
+	glm::vec3(-0.9f, 0.33f, 0.6f),		// bola 13
+	glm::vec3(0.1f, 0.33f, 0.3f),		// bola 14
+	glm::vec3(0.4f, 0.33f, -0.6f),		// bola 15
+};
 
 #pragma endregion
 
@@ -93,6 +115,9 @@ int main()
 
 	// inicializa a cena pela primeira vez
 	init();
+
+
+	glfwSetKeyCallback(window, keyCallback);
 
 	// quando o utilizador faz scroll com o mouse
 	glfwSetScrollCallback(window, scrollCallback);
@@ -353,24 +378,7 @@ void display(void) {
 	glBindVertexArray(_tableVAO);
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
 
-	// posições das bolas
-	std::vector<glm::vec3> _ballPositions = {
-		glm::vec3(1.1f, 0.33f, 1.1f),		// bola 1
-		glm::vec3(-1.1f, 0.33f, -1.1f),		// bola 2
-		glm::vec3(-1.1f, 0.33f, 1.1f),		// bola 3
-		glm::vec3(1.1f, 0.33f, -1.1f),		// bola 4
-		glm::vec3(0.1f, 0.33f, -0.1f),		// bola 5
-		glm::vec3(-0.3f, 0.33f, -0.3f),		// bola 6
-		glm::vec3(-0.6f, 0.33f, -0.4f),		// bola 7
-		glm::vec3(0.8f, 0.33f, 0.7f),		// bola 8
-		glm::vec3(-0.8f, 0.33f, -0.2f),		// bola 9
-		glm::vec3(0.3f, 0.33f, 0.7f),		// bola 10
-		glm::vec3(-0.2f, 0.33f, -0.8f),		// bola 11
-		glm::vec3(0.7f, 0.33f, 0.5f),		// bola 12
-		glm::vec3(-0.9f, 0.33f, 0.6f),		// bola 13
-		glm::vec3(0.1f, 0.33f, 0.3f),		// bola 14
-		glm::vec3(0.4f, 0.33f, -0.6f),		// bola 15
-	};
+	
 
 	PoolBalls::Material material;
 	material.ka = glm::vec3(1.0, 1.0, 1.0);
@@ -409,7 +417,40 @@ void display(void) {
 		glBindVertexArray(0);
 		glDrawArrays(GL_TRIANGLES, 0, _rendererBalls.getBallsVertices()[i].size() / 8);
 	}
+
+	if (_animationStarted) {
+		_ballPositions[animatedballIndex].x += 0.005f;
+		_ballPositions[animatedballIndex].z += 0.005f;
+
+		if (collision()) {
+			_animationStarted = false;
+		}
+	}
+
 }
+
+
+bool collision() {
+	float _ballRadius = 0.08f;
+
+	for (int i = 0; i < _ballPositions.size(); i++) {
+		if (i != animatedballIndex) {
+			float distance = glm::distance(_ballPositions[i], _ballPositions[animatedballIndex]);
+			if (distance <= 2 * _ballRadius) {
+				return true; // Colisão detectada
+			}
+		}
+	}
+
+	// Verificar colisão com os limites da mesa
+	if (_ballPositions[animatedballIndex].x + _ballRadius >= 1.25f || _ballPositions[animatedballIndex].x - _ballRadius <= -1.25f ||
+		_ballPositions[animatedballIndex].y + _ballRadius >= 1.25f || _ballPositions[animatedballIndex].y - _ballRadius <= -1.25f) {
+		return true; // Colisão detectada
+	}
+
+	return false; // Nenhuma colisão
+}
+
 
 #pragma endregion
 
@@ -435,8 +476,16 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	_zoomLevel = std::max(_minZoom, std::min(_maxZoom, _zoomLevel));
 }
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+		_animationStarted = true;
+	}
+}
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
+
+	
+
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
 	{
 		_lastX = xpos;

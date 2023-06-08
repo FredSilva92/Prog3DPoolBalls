@@ -32,6 +32,8 @@
 	void printErrorCallback(int code, const char* description);
 	void init(void);
 	void display(void);
+	bool collision(void);
+	void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods);
 	void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 	void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 	void charCallback(GLFWwindow* window, unsigned int codepoint);
