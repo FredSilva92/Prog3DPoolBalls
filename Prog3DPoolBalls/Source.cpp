@@ -346,6 +346,9 @@ void display(void) {
 	GLint renderTex = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "renderTex");
 	glProgramUniform1i(_programShader, renderTex, 0);
 
+	GLint viewPositionLoc = glGetUniformLocation(_programShader, "viewPosition");
+	glUniform3f(viewPositionLoc, _cameraPosition.x, _cameraPosition.y, _cameraPosition.z);
+
 	// desenha a mesa na tela
 	glBindVertexArray(_tableVAO);
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
