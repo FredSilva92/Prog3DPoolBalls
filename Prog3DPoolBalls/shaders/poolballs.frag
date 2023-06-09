@@ -88,7 +88,7 @@ vec4 calcSpotLight(SpotLight light);
 void main()
 {
 	// cálculo da componente emissiva do material
-	vec4 emissive = vec4(material.emissive, 1.0);
+	//vec4 emissive = vec4(material.emissive, 1.0);
 
 	vec4 lightToUse;
 
@@ -98,15 +98,17 @@ void main()
 		lightToUse = calcPointLight(pointLight);
 	} else if (lightModel == 4) {
 		lightToUse = calcSpotLight(spotLight);
-	}  else {
+	} else {
 		lightToUse = calcAmbientLight(ambientLight);
 	}
 
 	if (renderTex == 1) {
 		vec4 texColor = texture(sampler, textureCoord);
-		fColor = (lightToUse) * texColor;
-	} else  {
-		fColor = (lightToUse) * vec4(color, 1.0f);
+		//fColor = (emissive + lightToUse) * texColor;
+		fColor = lightToUse * texColor;
+	} else {
+		//fColor = (emissive + lightToUse) * vec4(color, 1.0f);
+		fColor = lightToUse * vec4(color, 1.0f);
 	}
 }
 
@@ -178,8 +180,7 @@ vec4 calcPointLight(PointLight light) {
 }
 
 vec4 calcSpotLight(SpotLight light) {
-
-	    // Ambient
+	// Ambient
     vec3 ambient =  material.ambient * light.ambient;
     // Diffuse
     vec3 norm = normalize(color);
@@ -195,8 +196,7 @@ vec4 calcSpotLight(SpotLight light) {
 
 	float theta = dot(lightDir, normalize(-light.direction));
 	
-	
-		// Spotlight (soft edges)
+	// Spotlight (soft edges)
 
 	float epsilon = (light.cutoff - light.outerCutOff);
 	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
@@ -211,5 +211,4 @@ vec4 calcSpotLight(SpotLight light) {
 	specular *= attenuation;
     
     return vec4(ambient + diffuse + specular, 1.0f);
-	
 }

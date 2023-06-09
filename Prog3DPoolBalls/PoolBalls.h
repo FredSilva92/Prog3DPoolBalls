@@ -53,7 +53,7 @@ namespace PoolBalls {
 		GLuint* _ballsVBOs;
 		std::vector<Material> _ballsMaterials;
 		std::vector<Texture> _ballsTextures;
-		GLuint _programShader;
+		//GLuint _programShader;
 
 	public:
 		// aceder atributos fora da classe - getters
@@ -69,20 +69,20 @@ namespace PoolBalls {
 			return _ballsMaterials;
 		}
 
-		GLuint getProgramShader() const {
-			return _programShader;
-		}
+		//GLuint getProgramShader() const {
+		//	return _programShader;
+		//}
 
 		// aceder atributos fora da classe - setters
-		void setProgramShader(GLuint programShader) {
-			_programShader = programShader;
-		}
+		//void setProgramShader(GLuint programShader) {
+		//	_programShader = programShader;
+		//}
 
 		// construtor
 		RendererBalls(GLuint numberOfBalls) : _numberOfBalls(numberOfBalls) {
 			_ballsVAOs = new GLuint[_numberOfBalls];
 			_ballsVBOs = new GLuint[_numberOfBalls];
-			_programShader = -1;
+			//_programShader = -1;
 		}
 
 		// destrutor
@@ -104,8 +104,8 @@ namespace PoolBalls {
 		std::string getMtlFromObj(const char* objFilepath);
 		Material loadMaterial(const char* mtlFilename);
 		Texture loadTexture(std::string imageFilename);
-		void loadLightingUniforms();
-		void loadMaterialUniforms(Material material, glm::vec3 emissive);
+		void loadMaterialUniforms(GLuint programShader, Material material, glm::vec3 emissive);
+		void loadLightingUniforms(GLuint programShader);
 	};
 
 #pragma endregion

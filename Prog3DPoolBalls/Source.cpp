@@ -116,16 +116,13 @@ int main()
 	// inicializa a cena pela primeira vez
 	init();
 
-
-	glfwSetKeyCallback(window, keyCallback);
-
 	// quando o utilizador faz scroll com o mouse
 	glfwSetScrollCallback(window, scrollCallback);
 
 	// quando o utilizador muda a visão da câmara
 	glfwSetCursorPosCallback(window, mouseCallback);
 
-	// quando é pressionada uma tecla (para ativar/desativar os diferentes tipos de luzes)
+	// quando é pressionada uma tecla
 	glfwSetCharCallback(window, charCallback);
 
 	// mantém a janela aberta e atualizada
@@ -340,9 +337,9 @@ void init(void) {
 	glProgramUniformMatrix4fv(_programShader, projectionId, 1, GL_FALSE, glm::value_ptr(_projection));
 	glProgramUniformMatrix3fv(_programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(_normalMatrix));
 
-	_rendererBalls.setProgramShader(_programShader);
+	//_rendererBalls.setProgramShader(_programShader);
 
-	_rendererBalls.loadLightingUniforms();
+	_rendererBalls.loadLightingUniforms(_programShader);
 
 	// define a janela de renderização
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -378,18 +375,19 @@ void display(void) {
 	glBindVertexArray(_tableVAO);
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
 
-	
+	//PoolBalls::Material material;
+	//material.ns = 12.0f;
+	//material.ka = glm::vec3(1.0, 1.0, 1.0);
+	//material.kd = glm::vec3(1.0, 1.0, 1.0);
+	//material.ks = glm::vec3(1.0, 1.0, 1.0);
 
-	PoolBalls::Material material;
-	material.ka = glm::vec3(1.0, 1.0, 1.0);
-	material.kd = glm::vec3(1.0, 1.0, 1.0);
-	material.ks = glm::vec3(1.0, 1.0, 1.0);
-	material.ns = 12.0f;
-
-	_rendererBalls.loadMaterialUniforms(material, glm::vec3(0));
+	//_rendererBalls.loadMaterialUniforms(_programShader, material, glm::vec3(0));
 
 	// desenha para cada bola
 	for (int i = 0; i < _rendererBalls.getNumberOfBalls(); i++) {
+		PoolBalls::Material material = _rendererBalls.getBallsMaterials()[i];
+		_rendererBalls.loadMaterialUniforms(_programShader, material, glm::vec3(0.5));
+
 		// translação da bola
 		translatedModel = glm::translate(_model, _ballPositions[i]);
 
@@ -411,8 +409,6 @@ void display(void) {
 		glProgramUniform1i(_programShader, locationTexSampler1, i /*unidade de textura*/);
 		glProgramUniform1i(_programShader, renderTex, 1);
 
-		_rendererBalls.loadMaterialUniforms(_rendererBalls.getBallsMaterials()[i], glm::vec3(0.2));
-
 		// desenha a bola na tela
 		glBindVertexArray(0);
 		glDrawArrays(GL_TRIANGLES, 0, _rendererBalls.getBallsVertices()[i].size() / 8);
@@ -426,9 +422,7 @@ void display(void) {
 			_animationStarted = false;
 		}
 	}
-
 }
-
 
 bool collision() {
 	float _ballRadius = 0.08f;
@@ -450,7 +444,6 @@ bool collision() {
 
 	return false; // Nenhuma colisão
 }
-
 
 #pragma endregion
 
@@ -476,16 +469,8 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	_zoomLevel = std::max(_minZoom, std::min(_maxZoom, _zoomLevel));
 }
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		_animationStarted = true;
-	}
-}
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
-
-	
-
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
 	{
 		_lastX = xpos;
@@ -529,25 +514,29 @@ void charCallback(GLFWwindow* window, unsigned int codepoint)
 	case '1':
 		lightModel = 1;
 		std::cout << "Luz ambiente ativada." << std::endl;
+		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		break;
 	case '2':
 		lightModel = 2;
 		std::cout << "Luz direcional ativada." << std::endl;
+		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		break;
 	case '3':
 		lightModel = 3;
 		std::cout << "Luz pontual ativada." << std::endl;
+		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		break;
 	case '4':
 		lightModel = 4;
-		std::cout << "Luz cónica ativada." << std::endl;
+		std::cout << "Luz conica ativada." << std::endl;
+		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		break;
+	case GLFW_KEY_SPACE:
+		_animationStarted = true;
+		std::cout << "Animaçao da bola." << std::endl;
 	default:
-		lightModel = 1;
 		break;
 	}
-
-	glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
 }
 
 #pragma endregion
