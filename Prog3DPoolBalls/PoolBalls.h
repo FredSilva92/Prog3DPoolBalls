@@ -104,7 +104,7 @@ namespace PoolBalls {
 		std::string getMtlFromObj(const char* objFilepath);
 		Material loadMaterial(const char* mtlFilename);
 		Texture loadTexture(std::string imageFilename);
-		void loadMaterialUniforms(GLuint programShader, Material material, glm::vec3 emissive);
+		void loadMaterialUniforms(GLuint programShader, Material material);
 		void loadLightingUniforms(GLuint programShader);
 	};
 

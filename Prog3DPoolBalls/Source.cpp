@@ -375,19 +375,8 @@ void display(void) {
 	glBindVertexArray(_tableVAO);
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
 
-	//PoolBalls::Material material;
-	//material.ns = 12.0f;
-	//material.ka = glm::vec3(1.0, 1.0, 1.0);
-	//material.kd = glm::vec3(1.0, 1.0, 1.0);
-	//material.ks = glm::vec3(1.0, 1.0, 1.0);
-
-	//_rendererBalls.loadMaterialUniforms(_programShader, material, glm::vec3(0));
-
 	// desenha para cada bola
 	for (int i = 0; i < _rendererBalls.getNumberOfBalls(); i++) {
-		PoolBalls::Material material = _rendererBalls.getBallsMaterials()[i];
-		_rendererBalls.loadMaterialUniforms(_programShader, material, glm::vec3(0.5));
-
 		// translação da bola
 		translatedModel = glm::translate(_model, _ballPositions[i]);
 
@@ -398,6 +387,9 @@ void display(void) {
 		modelView = _view * scaledModel;
 
 		//_rendererBalls.Draw(_ballPositions[i], glm::vec3(0));
+
+		PoolBalls::Material material = _rendererBalls.getBallsMaterials()[i];
+		_rendererBalls.loadMaterialUniforms(_programShader, material);
 
 		// obtém a localização do uniform
 		modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
