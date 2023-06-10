@@ -433,16 +433,16 @@ void display(void) {
 	}
 
 	// se animação da bola iniciou
-	if (_animationStarted) {
+	if (_animationStarted && !_animationFinished) {
 		// move a bola
 		_ballPositions[animatedballIndex].x += 0.001f;
 		_ballPositions[animatedballIndex].z += 0.001f;
-		
+
 		// roda a bola
 		_ballRotations[animatedballIndex] += 2.0f;
 
 		// se colidiu com outro objeto
-		if (collision()) {
+		if (isColliding()) {
 			_animationStarted = false;
 			_animationFinished = true;
 			std::cout << "Colidiu com bola ou mesa." << std::endl;
@@ -450,25 +450,27 @@ void display(void) {
 	}
 }
 
-bool collision() {
+bool isColliding() {
 	float _ballRadius = 0.08f;
 
 	for (int i = 0; i < _ballPositions.size(); i++) {
 		if (i != animatedballIndex) {
 			float distance = glm::distance(_ballPositions[i], _ballPositions[animatedballIndex]);
+		
+			// se colidiu com alguma bola
 			if (distance <= 2 * _ballRadius) {
-				return true; // Colisão detectada
+				return true;
 			}
 		}
 	}
 
-	// Verificar colisão com os limites da mesa
+	// se colidiu com os limites da mesa
 	if (_ballPositions[animatedballIndex].x + _ballRadius >= 1.25f || _ballPositions[animatedballIndex].x - _ballRadius <= -1.25f ||
 		_ballPositions[animatedballIndex].y + _ballRadius >= 1.25f || _ballPositions[animatedballIndex].y - _ballRadius <= -1.25f) {
-		return true; // Colisão detectada
+		return true;
 	}
 
-	return false; // Nenhuma colisão
+	return false;
 }
 
 #pragma endregion
@@ -539,27 +541,39 @@ void charCallback(GLFWwindow* window, unsigned int codepoint)
 	{
 	case '1':
 		lightModel = 1;
-		std::cout << "Luz ambiente ativada." << std::endl;
 		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		std::cout << "Luz ambiente ativada." << std::endl;
 		break;
+
 	case '2':
 		lightModel = 2;
-		std::cout << "Luz direcional ativada." << std::endl;
 		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		std::cout << "Luz direcional ativada." << std::endl;
 		break;
+
 	case '3':
 		lightModel = 3;
-		std::cout << "Luz pontual ativada." << std::endl;
 		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		std::cout << "Luz pontual ativada." << std::endl;
 		break;
+
 	case '4':
 		lightModel = 4;
-		std::cout << "Luz conica ativada." << std::endl;
 		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		std::cout << "Luz conica ativada." << std::endl;
 		break;
+
 	case GLFW_KEY_SPACE:
-		_animationStarted = true;
-		std::cout << "Animacao da bola." << std::endl;
+		if (!_animationFinished) {
+			_animationStarted = true;
+			std::cout << "Animacao da bola iniciada." << std::endl;
+		}
+		else {
+			std::cout << "Animacao da bola encerrada." << std::endl;
+		}
+
+		break;
+
 	default:
 		break;
 	}

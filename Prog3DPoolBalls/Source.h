@@ -23,6 +23,7 @@
 
 	void init(void);
 	void display(void);
+	bool isColliding(void);
 
 #pragma endregion
 
@@ -30,9 +31,6 @@
 #pragma region funções de callbacks para a biblioteca glfw
 
 	void printErrorCallback(int code, const char* description);
-	void init(void);
-	void display(void);
-	bool collision(void);
 	void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 	void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 	void charCallback(GLFWwindow* window, unsigned int codepoint);
