@@ -56,8 +56,10 @@ float _zoomLevel = 1.0f;
 float _minZoom = 0.1f;
 float _maxZoom = 10.0f;
 float _zoomSpeed = 0.1f;
-bool _animationStarted = false;
 
+// animação de uma bola
+bool _animationStarted = false;
+bool _animationFinished = false;
 int animatedballIndex = 4;
 
 // posições das bolas
@@ -77,6 +79,25 @@ std::vector<glm::vec3> _ballPositions = {
 	glm::vec3(-0.9f, 0.33f, 0.6f),		// bola 13
 	glm::vec3(0.1f, 0.33f, 0.3f),		// bola 14
 	glm::vec3(0.4f, 0.33f, -0.6f),		// bola 15
+};
+
+// rotações das bolas
+std::vector<float> _ballRotations = {
+	0.0f,		// bola 1
+	0.0f,		// bola 2
+	0.0f,		// bola 3
+	0.0f,		// bola 4
+	0.0f,		// bola 5
+	0.0f,		// bola 6
+	0.0f,		// bola 7
+	0.0f,		// bola 8
+	0.0f,		// bola 9
+	0.0f,		// bola 10
+	0.0f,		// bola 11
+	0.0f,		// bola 12
+	0.0f,		// bola 13
+	0.0f,		// bola 14
+	0.0f,		// bola 15
 };
 
 #pragma endregion
@@ -380,8 +401,13 @@ void display(void) {
 		// translação da bola
 		translatedModel = glm::translate(_model, _ballPositions[i]);
 
+		// rotação da bola em torno do eixo Z
+		glm::mat4 rotatedModel = glm::rotate(translatedModel, glm::radians(_ballRotations[i]), glm::vec3(0.0f, 0.0f, 1.0f));	// rotação no eixo z
+		rotatedModel = glm::rotate(rotatedModel, glm::radians(_ballRotations[i]), glm::vec3(0.0f, 1.0f, 0.0f));					// rotação no eixo y
+		rotatedModel = glm::rotate(rotatedModel, glm::radians(_ballRotations[i]), glm::vec3(1.0f, 0.0f, 0.0f));					// rotação no eixo x
+
 		// escala de cada bola
-		glm::mat4 scaledModel = glm::scale(translatedModel, glm::vec3(0.08f));
+		glm::mat4 scaledModel = glm::scale(rotatedModel, glm::vec3(0.08f));
 
 		// modelo de visualização do objeto
 		modelView = _view * scaledModel;
@@ -406,12 +432,20 @@ void display(void) {
 		glDrawArrays(GL_TRIANGLES, 0, _rendererBalls.getBallsVertices()[i].size() / 8);
 	}
 
+	// se animação da bola iniciou
 	if (_animationStarted) {
-		_ballPositions[animatedballIndex].x += 0.005f;
-		_ballPositions[animatedballIndex].z += 0.005f;
+		// move a bola
+		_ballPositions[animatedballIndex].x += 0.001f;
+		_ballPositions[animatedballIndex].z += 0.001f;
+		
+		// roda a bola
+		_ballRotations[animatedballIndex] += 2.0f;
 
+		// se colidiu com outro objeto
 		if (collision()) {
 			_animationStarted = false;
+			_animationFinished = true;
+			std::cout << "Colidiu com bola ou mesa." << std::endl;
 		}
 	}
 }
@@ -525,7 +559,7 @@ void charCallback(GLFWwindow* window, unsigned int codepoint)
 		break;
 	case GLFW_KEY_SPACE:
 		_animationStarted = true;
-		std::cout << "Animaçao da bola." << std::endl;
+		std::cout << "Animacao da bola." << std::endl;
 	default:
 		break;
 	}
