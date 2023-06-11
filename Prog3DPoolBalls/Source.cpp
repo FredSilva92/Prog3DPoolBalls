@@ -250,7 +250,7 @@ void init(void) {
 	glBindVertexArray(_tableVAO);
 
 	// posições das bolas
-	std::vector<glm::vec3> _ballPositions = {
+	std::vector<glm::vec3> _positions = {
 		glm::vec3(1.1f, 0.33f, 1.1f),		// bola 1
 		glm::vec3(-1.1f, 0.33f, -1.1f),		// bola 2
 		glm::vec3(-1.1f, 0.33f, 1.1f),		// bola 3
@@ -269,7 +269,7 @@ void init(void) {
 	};
 
 	// rotações das bolas
-	std::vector<glm::vec3> _ballOrientations = {
+	std::vector<glm::vec3> _orientations = {
 		glm::vec3(0.0f),		// bola 1
 		glm::vec3(0.0f),		// bola 2
 		glm::vec3(0.0f),		// bola 3
@@ -299,8 +299,8 @@ void init(void) {
 
 		_rendererBalls[i].Send();
 
-		_rendererBalls[i].setPosition(_ballPositions[i]);
-		_rendererBalls[i].setOrientation(_ballOrientations[i]);
+		_rendererBalls[i].setPosition(_positions[i]);
+		_rendererBalls[i].setOrientation(_orientations[i]);
 	}
 
 	// cria informações dos shaders

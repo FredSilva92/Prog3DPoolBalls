@@ -99,20 +99,20 @@ namespace Pool {
 #pragma region funções getters e setters da classe RendererBall
 
 	// getters
-	const std::vector<float>& RendererBall::getBallVertices() const {   // retorna apontador para ser mais eficiente ao renderizar
-		return *_ballVertices;
+	const std::vector<float>& RendererBall::getVertices() const {   // retorna apontador para ser mais eficiente ao renderizar
+		return *_vertices;
 	}
 
-	const Material& RendererBall::getBallMaterial() const {
-		return *_ballMaterial;
+	const Material& RendererBall::getMaterial() const {
+		return *_material;
 	}
 
 	glm::vec3 RendererBall::getPosition()const {
-		return _ballPosition;
+		return _position;
 	}
 
 	glm::vec3 RendererBall::getOrientation() const {
-		return _ballOrientation;
+		return _orientation;
 	}
 
 	// setters
@@ -121,36 +121,36 @@ namespace Pool {
 	}
 
 	void RendererBall::setPosition(glm::vec3 position) {
-		_ballPosition = position;
+		_position = position;
 	}
 
 	void RendererBall::setOrientation(glm::vec3 orientation) {
-		_ballOrientation = orientation;
+		_orientation = orientation;
 	}
 
 #pragma endregion
 
 
-#pragma region construtores e destrutor da classe RendererBall
+#pragma region construtor e destrutor da classe RendererBall
 
 	// construtor
-	RendererBall::RendererBall() {
+	RendererBall::RendererBall(void) {
 		_id = 0;
 		_objFilepath = new char;
-		_ballVertices = new std::vector<float>;
-		_ballVAO = new GLuint;
-		_ballVBO = new GLuint;
-		_ballMaterial = new Material;
-		_ballTexture = new Texture;
+		_vertices = new std::vector<float>;
+		_vao = new GLuint;
+		_vbo = new GLuint;
+		_material = new Material;
+		_texture = new Texture;
 	}
 
 	// destrutor
-	RendererBall::~RendererBall() {
+	RendererBall::~RendererBall(void) {
 		// liberta memória
 		delete[] _objFilepath;
-		delete[] _ballVertices;
-		delete[] _ballVAO;
-		delete[] _ballVBO;
+		delete[] _vertices;
+		delete[] _vao;
+		delete[] _vbo;
 	}
 
 #pragma endregion
@@ -207,34 +207,34 @@ namespace Pool {
 		}
 
 		// armazena o modelo 3D
-		_ballVertices = load3dModel(_objFilepath);
+		_vertices = load3dModel(_objFilepath);
 
 		// armazena o material
 		std::string mtlFilename = getMtlFromObj(_objFilepath);
-		_ballMaterial = loadMaterial(mtlFilename.c_str());
+		_material = loadMaterial(mtlFilename.c_str());
 
 		// armazena a textura
-		std::string textureFilename = _ballMaterial->map_kd;
-		_ballTexture = loadTexture(textureFilename);
+		std::string textureFilename = _material->map_kd;
+		_texture = loadTexture(textureFilename);
 	}
 
 	void RendererBall::Send(void) {
 		// gera o nome para o VAO da bola
-		glGenVertexArrays(1, _ballVAO);
+		glGenVertexArrays(1, _vao);
 
 		// vincula o VAO da bola ao contexto OpenGL atual
-		glBindVertexArray(*_ballVAO);
+		glBindVertexArray(*_vao);
 
 		// gera o nome para o VBO da bola
-		glGenBuffers(1, _ballVBO);
+		glGenBuffers(1, _vbo);
 
 		// para cada vértice da da bola
-		for (int i = 0; i < _ballVertices->size(); i++) {
+		for (int i = 0; i < _vertices->size(); i++) {
 			// vincula o VBO ao contexto OpenGL atual
-			glBindBuffer(GL_ARRAY_BUFFER, *_ballVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, *_vbo);
 
 			// inicializa o VBO atualmente ativo com dados imutáveis
-			glBufferStorage(GL_ARRAY_BUFFER, _ballVertices->size() * sizeof(float), _ballVertices->data(), 0);
+			glBufferStorage(GL_ARRAY_BUFFER, _vertices->size() * sizeof(float), _vertices->data(), 0);
 
 			// ativa atributos das posições dos vértices
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
@@ -257,7 +257,7 @@ namespace Pool {
 		glGenTextures(1, &textureName);
 
 		// ativa a unidade de textura atual (inicia na unidade 0)
-		glActiveTexture(GL_TEXTURE0 + _id);
+		glActiveTexture(GL_TEXTURE0 + (_id - 1));
 
 		// vincula um nome de textura ao target GL_TEXTURE_2D da unidade de textura ativa
 		glBindTexture(GL_TEXTURE_2D, textureName);
@@ -269,14 +269,14 @@ namespace Pool {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		// carrega os dados da imagem para o objeto de textura vinculado ao target GL_TEXTURE_2D da unidade de textura ativa
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _ballTexture->width, _ballTexture->height, 0, _ballTexture->nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, _ballTexture->image);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _texture->width, _texture->height, 0, _texture->nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, _texture->image);
 
 		// gera o mipmap para essa textura
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
 	void RendererBall::Draw(glm::vec3 position, glm::vec3 orientation) {
-		Material* material = _ballMaterial;
+		Material* material = _material;
 		loadMaterialLighting(_programShader, *material);
 
 		// translação da bola
@@ -303,12 +303,12 @@ namespace Pool {
 		glProgramUniform1i(_programShader, renderTex, 0);
 
 		GLint locationTexSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "sampler");
-		glProgramUniform1i(_programShader, locationTexSampler1, _id/*unidade de textura*/);
+		glProgramUniform1i(_programShader, locationTexSampler1, (_id - 1)/*unidade de textura*/);
 		glProgramUniform1i(_programShader, renderTex, 1);
 
 		// desenha a bola na tela
 		glBindVertexArray(0);
-		glDrawArrays(GL_TRIANGLES, 0, _ballVertices->size() / 8);
+		glDrawArrays(GL_TRIANGLES, 0, _vertices->size() / 8);
 	}
 
 #pragma endregion

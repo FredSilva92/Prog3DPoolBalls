@@ -62,19 +62,19 @@ namespace Pool {
 		int _id;	// identificador único para depois saber qual a unidade de textura que pertence, entre outros dados que este seja útil
 
 		const char* _objFilepath;
-		std::vector<float>* _ballVertices;
-		GLuint* _ballVAO;
-		GLuint* _ballVBO;
-		Material* _ballMaterial;
-		Texture* _ballTexture;
+		std::vector<float>* _vertices;
+		GLuint* _vao;
+		GLuint* _vbo;
+		Material* _material;
+		Texture* _texture;
 
-		glm::vec3 _ballPosition;
-		glm::vec3 _ballOrientation;
+		glm::vec3 _position;
+		glm::vec3 _orientation;
 
 	public:
 		// getters - definir valores de atributos fora da classe
-		const std::vector<float>& getBallVertices() const;
-		const Material& getBallMaterial() const;
+		const std::vector<float>& getVertices() const;
+		const Material& getMaterial() const;
 		glm::vec3 getPosition() const;
 		glm::vec3 getOrientation() const;
 
