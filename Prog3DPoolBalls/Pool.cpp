@@ -1,4 +1,12 @@
-﻿#pragma region importações
+﻿/*
+ * @descrição	Ficheiro com todo o código relativo à biblioteca Pool.
+ * @ficheiro	Pool.cpp
+ * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
+ * @data		11/06/2023
+*/
+
+
+#pragma region importações
 
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "glfw3.lib")
@@ -255,6 +263,7 @@ namespace Pool {
 		// atribui o valor ao uniform
 		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
+		// define que a mesa tem textura (valor 1)
 		GLint isRenderTexture = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "isRenderTexture");
 		glProgramUniform1i(_programShader, isRenderTexture, 1);
 

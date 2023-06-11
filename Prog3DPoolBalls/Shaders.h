@@ -1,3 +1,11 @@
+/*
+ * @descrição	Ficheiro com todas as assinaturas relativas ao carregamento de shaders.
+ * @ficheiro	Shaders.h
+ * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
+ * @data		11/06/2023
+*/
+
+
 #pragma once
 
 #ifndef LOAD_SHADERS_H

@@ -1,4 +1,12 @@
-﻿#pragma region importações
+﻿/*
+ * @descrição	Ficheiro com todo o código relativo ao carregamento de shaders.
+ * @ficheiro	Shaders.cpp
+ * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
+ * @data		11/06/2023
+*/
+
+
+#pragma region importações
 
 #include <iostream>
 #include <fstream>

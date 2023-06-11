@@ -1,4 +1,12 @@
-﻿#version 440 core
+﻿/*
+ * @descrição	Ficheiro relativo ao fragment shader.
+ * @ficheiro	Pool.frag
+ * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
+ * @data		11/06/2023
+*/
+
+
+#version 440 core
 
 uniform mat4 Model;
 uniform mat4 View;
@@ -71,7 +79,7 @@ struct Material {
 
 uniform AmbientLight ambientLight;			// fonte de luz ambiente
 uniform DirectionalLight directionalLight;	// fonte de luz direcional
-uniform PointLight pointLight;				// duas fontes de luz pontual
+uniform PointLight pointLight;				// fonte de luz pontual
 uniform SpotLight spotLight;				// fonte de luz cónica
 uniform Material material;					// material do objeto
 

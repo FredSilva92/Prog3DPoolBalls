@@ -1,3 +1,11 @@
+/*
+ * @descrição	Ficheiro relativo ao vertex shader.
+ * @ficheiro	Pool.vert
+ * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
+ * @data		11/06/2023
+*/
+
+
 #version 440 core
 
 layout(location = 0) in vec3 vPosition;

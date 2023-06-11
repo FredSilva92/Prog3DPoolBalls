@@ -1,4 +1,17 @@
-﻿#pragma region importações
+﻿/*
+ * @descrição	Ficheiro principal da aplicação, com o ponto de entrada e, as variáveis e funções gerais da aplicação.
+ * @ficheiro	Source.cpp
+ * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
+ * @data		11/06/2023
+ *
+ * -------------------------------------
+ *
+ * Proposta de software para a renderização de um cenário 3D, com a parecença de uma mesa de bilhar e suas bolas,
+ * aplicando texturas e iluminação, e realizar animação de uma das bolas.
+*/
+
+
+#pragma region importações
 
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "glfw3.lib")
@@ -40,18 +53,13 @@ const int _numberOfBalls = 15;
 Pool::RendererBall _rendererBalls[_numberOfBalls];
 
 // câmara
-GLfloat _angle = 0.0f;
+GLfloat _angle = 20.0f;
 glm::vec3 _cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 
 // eventos do mouse
 float _lastX = 0.0f;
 float _lastY = 0.0f;
 bool _firstMouse = true;
-
-float _zoomLevel = 1.0f;
-float _minZoom = 0.1f;
-float _maxZoom = 10.0f;
-float _zoomSpeed = 0.1f;
 
 // animação de uma bola
 int _animatedBallIndex = 4;
@@ -332,8 +340,8 @@ void init(void) {
 
 	// informações dos shaders
 	ShaderInfo shaders[] = {
-		{ GL_VERTEX_SHADER,   "shaders/pool.vert" },
-		{ GL_FRAGMENT_SHADER, "shaders/pool.frag" },
+		{ GL_VERTEX_SHADER,   "shaders/Pool.vert" },
+		{ GL_FRAGMENT_SHADER, "shaders/Pool.frag" },
 		{ GL_NONE, NULL }
 	};
 
@@ -358,7 +366,7 @@ void init(void) {
 	Pool::sendAttributesToProgramShader(&Pool::_programShader);
 
 	// matrizes de transformação
-	Pool::_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	Pool::_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.7f, 1.0f, 0.0f));
 	Pool::_viewMatrix = glm::lookAt(
 		_cameraPosition,				// posição da câmara
 		glm::vec3(0.0f, 0.0f, 0.0f),	// para onde está a "olhar"
@@ -412,11 +420,12 @@ void display(void) {
 	// atribui o valor ao uniform
 	glProgramUniformMatrix4fv(Pool::_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
+	// define que a mesa não tem textura (valor 0)
 	GLint isRenderTexture = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "isRenderTexture");
 	glProgramUniform1i(Pool::_programShader, isRenderTexture, 0);
 
-	//GLint viewPositionLoc = glGetUniformLocation(Pool::_programShader, "viewPosition");
-	//glUniform3f(viewPositionLoc, _cameraPosition.x, _cameraPosition.y, _cameraPosition.z);
+	GLint viewPositionLoc = glGetUniformLocation(Pool::_programShader, "viewPosition");
+	glUniform3f(viewPositionLoc, _cameraPosition.x, _cameraPosition.y, _cameraPosition.z);
 
 	// desenha a mesa na tela
 	glBindVertexArray(_tableVAO);
@@ -527,17 +536,22 @@ void printErrorCallback(int code, const char* description) {
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
+	float zoomLevel = 1.0f;
+	float minZoom = 0.1f;
+	float maxZoom = 10.0f;
+	float zoomSpeed = 0.1f;
+
 	// converte a posição do mouse em coordenadas normalizadas
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
 	// calcula o zoom com base no deslocamento do scrol
-	float zoomFactor = 1.0f + static_cast<float>(yoffset) * _zoomSpeed;
+	float zoomFactor = 1.0f + static_cast<float>(yoffset) * zoomSpeed;
 
 	Pool::_viewMatrix = glm::scale(Pool::_viewMatrix, glm::vec3(zoomFactor, zoomFactor, zoomFactor));
 
-	_zoomLevel += yoffset * _zoomSpeed;
-	_zoomLevel = std::max(_minZoom, std::min(_maxZoom, _zoomLevel));
+	zoomLevel += yoffset * zoomSpeed;
+	zoomLevel = std::max(minZoom, std::min(maxZoom, zoomLevel));
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)

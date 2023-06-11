@@ -1,3 +1,11 @@
+/*
+ * @descrição	Ficheiro com todas as assinaturas relativas à biblioteca Pool.
+ * @ficheiro	Pool.h
+ * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
+ * @data		11/06/2023
+*/
+
+
 #pragma once
 
 #ifndef POOL_BALLS_H
@@ -59,7 +67,9 @@ namespace Pool {
 	class RendererBall {
 	private:
 		// atributos privados
-		int _id;	// identificador único para depois saber qual a unidade de textura que pertence, entre outros dados que este seja útil
+		int _id;	// identificador único para depois saber qual a unidade de textura que pertence, entre outros dados, que este seja útil
+		glm::vec3 _position;
+		glm::vec3 _orientation;
 
 		const char* _objFilepath;
 		std::vector<float>* _vertices;
@@ -67,9 +77,6 @@ namespace Pool {
 		GLuint* _vbo;
 		Material* _material;
 		Texture* _texture;
-
-		glm::vec3 _position;
-		glm::vec3 _orientation;
 
 	public:
 		// getters - definir valores de atributos fora da classe

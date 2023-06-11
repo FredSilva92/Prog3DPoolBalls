@@ -132,8 +132,8 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\pool.frag" />
-    <None Include="shaders\pool.vert" />
+    <None Include="shaders\Pool.frag" />
+    <None Include="shaders\Pool.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shaders.h" />
