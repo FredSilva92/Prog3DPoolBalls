@@ -14,7 +14,7 @@ layout(location = 5) out vec3 fragPos;
 
 uniform mat4 Model;
 uniform mat4 View;
-uniform mat4 ModelView;		// View * Model
+uniform mat4 ModelView;	
 uniform mat4 Projection;
 uniform mat3 NormalMatrix;
 
@@ -23,10 +23,8 @@ void main()
     gl_Position = Projection * ModelView * vec4(vPosition, 1.0);
     color = vColors;
 
-    // Posição do vértice em coordenadas do olho.
 	vPositionEyeSpace = (ModelView * vec4(vPosition, 1.0)).xyz;
 
-	// Transformar a normal do vértice.
 	vNormalEyeSpace = normalize(NormalMatrix * vColors);
 
 	fragPos = vec3(Model * vec4(vPosition, 1.0f));
