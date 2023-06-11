@@ -22,7 +22,7 @@
 #pragma endregion
 
 
-namespace PoolBalls {
+namespace Pool {
 
 #pragma region declarações da biblioteca
 
@@ -48,45 +48,39 @@ namespace PoolBalls {
 	private:
 		// atributos privados
 		const char* _objFilepath;
-		std::vector<float> _ballVertices;
+		std::vector<float>* _ballVertices;
 		GLuint* _ballVAO;
 		GLuint* _ballVBO;
-		Material _ballMaterial;
-		Texture _ballTexture;
-		//GLuint _programShader;
+		Material* _ballMaterial;
+		Texture* _ballTexture;
 
 	public:
 		// aceder atributos fora da classe - getters
-		const std::vector<float>& getBallVertices() const {	// retorna apontador para ser mais eficiente no draw
-			return _ballVertices;
+		const std::vector<float>& getBallVertices() const {   // retorna apontador para ser mais eficiente ao renderizar
+			return *_ballVertices;
 		}
 
 		const Material& getBallMaterial() const {
-			return _ballMaterial;
+			return *_ballMaterial;
 		}
-
-		//GLuint getProgramShader() const {
-		//	return _programShader;
-		//}
-
-		// aceder atributos fora da classe - setters
-		//void setProgramShader(GLuint programShader) {
-		//	_programShader = programShader;
-		//}
 
 		// construtor
 		RendererBall() {
+			_objFilepath = new char;
+			_ballVertices = new std::vector<float>;
 			_ballVAO = new GLuint;
 			_ballVBO = new GLuint;
-			//_programShader = -1;
+			_ballMaterial = new Material;
+			_ballTexture = new Texture;
 		}
 
 		// destrutor
 		~RendererBall() {
 			// liberta memória
+			delete[] _objFilepath;
+			delete[] _ballVertices;
 			delete[] _ballVAO;
 			delete[] _ballVBO;
-			_ballVertices.clear();
 		}
 
 		// principais
@@ -95,11 +89,11 @@ namespace PoolBalls {
 		void Draw(glm::vec3 position, glm::vec3 orientation);
 
 		// secundárias
-		std::vector<float> load3dModel(const char* objFilepath);
+		std::vector<float>* load3dModel(const char* objFilepath);
 		std::string getMtlFromObj(const char* objFilepath);
-		Material loadMaterial(const char* mtlFilename);
-		Texture loadTexture(std::string imageFilename);
-		void LoadMaterialLighting(GLuint programShader, Material material);
+		Material* loadMaterial(const char* mtlFilename);
+		Texture* loadTexture(std::string imageFilename);
+		void loadMaterialLighting(GLuint programShader, Material material);
 	};
 
 #pragma endregion

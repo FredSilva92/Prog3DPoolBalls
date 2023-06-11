@@ -334,10 +334,8 @@ void init(void) {
 
 	sendUniformsToProgramShader(&_programShader, &_modelMatrix, &_viewMatrix, &modelViewMatrix, &_projectionMatrix, &_normalMatrix);
 
-	//_rendererBalls.setProgramShader(_programShader);
-
 	// carrega os diferentes tipos de luzes da cena
-	LoadSceneLighting();
+	loadSceneLighting();
 
 	// define a janela de renderização
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -392,7 +390,7 @@ void display(void) {
 		//_rendererBalls.Draw(_ballPositions[i], glm::vec3(0));
 
 		Pool::Material material = _rendererBalls[i].getBallMaterial();
-		_rendererBalls[i].LoadMaterialLighting(_programShader, material);
+		_rendererBalls[i].loadMaterialLighting(_programShader, material);
 
 		// obtém a localização do uniform
 		modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
@@ -427,7 +425,7 @@ void display(void) {
 	}
 }
 
-void LoadSceneLighting(void) {
+void loadSceneLighting(void) {
 	// fonte de luz ambiente
 	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(6.0f)));
 
