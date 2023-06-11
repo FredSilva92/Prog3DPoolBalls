@@ -412,8 +412,8 @@ void display(void) {
 	// atribui o valor ao uniform
 	glProgramUniformMatrix4fv(Pool::_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
-	GLint renderTex = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "renderTex");
-	glProgramUniform1i(Pool::_programShader, renderTex, 0);
+	GLint isRenderTexture = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "isRenderTexture");
+	glProgramUniform1i(Pool::_programShader, isRenderTexture, 0);
 
 	//GLint viewPositionLoc = glGetUniformLocation(Pool::_programShader, "viewPosition");
 	//glUniform3f(viewPositionLoc, _cameraPosition.x, _cameraPosition.y, _cameraPosition.z);

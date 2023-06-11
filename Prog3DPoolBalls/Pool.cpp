@@ -255,8 +255,8 @@ namespace Pool {
 		// atribui o valor ao uniform
 		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
-		GLint renderTex = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "renderTex");
-		glProgramUniform1i(_programShader, renderTex, 1);
+		GLint isRenderTexture = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "isRenderTexture");
+		glProgramUniform1i(_programShader, isRenderTexture, 1);
 
 		GLint locationTexSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "sampler");
 		glProgramUniform1i(_programShader, locationTexSampler1, (_id - 1)/*unidade de textura*/);
