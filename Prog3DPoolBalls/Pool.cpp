@@ -155,10 +155,10 @@ namespace Pool {
 	// destrutor
 	RendererBall::~RendererBall(void) {
 		// liberta memória
-		delete[] _objFilepath;
-		delete[] _vertices;
-		delete[] _vao;
-		delete[] _vbo;
+		delete _vao;
+		delete _vbo;
+		delete _material;
+		delete _texture;
 	}
 
 #pragma endregion

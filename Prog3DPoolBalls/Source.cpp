@@ -53,7 +53,7 @@ const int _numberOfBalls = 15;
 Pool::RendererBall _rendererBalls[_numberOfBalls];
 
 // câmara
-GLfloat _angle = 20.0f;
+GLfloat _angle = -10.0f;
 glm::vec3 _cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 
 // eventos do mouse
@@ -140,7 +140,7 @@ void init(void) {
 	// -----------------------------------------------------------
 	// Carregar dados da mesa para CPU
 	// -----------------------------------------------------------
-	
+
 	// posição da mesa
 	float xCoord = 1.25f;
 	float yCoord = 0.25f;
@@ -366,7 +366,7 @@ void init(void) {
 	Pool::sendAttributesToProgramShader(&Pool::_programShader);
 
 	// matrizes de transformação
-	Pool::_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.7f, 1.0f, 0.0f));
+	Pool::_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.0f, 1.0f, 0.15f));
 	Pool::_viewMatrix = glm::lookAt(
 		_cameraPosition,				// posição da câmara
 		glm::vec3(0.0f, 0.0f, 0.0f),	// para onde está a "olhar"
@@ -399,7 +399,7 @@ void display(void) {
 	// -----------------------------------------------------------
 	// Limpar buffers
 	// -----------------------------------------------------------
-	
+
 	// limpa o buffer de cor e de profundidade
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -435,7 +435,7 @@ void display(void) {
 	// -----------------------------------------------------------
 	// Desenhar bolas
 	// -----------------------------------------------------------
-	
+
 	// desenha para cada bola
 	for (int i = 0; i < _numberOfBalls; i++) {
 		_rendererBalls[i].Draw(_rendererBalls[i].getPosition(), _rendererBalls[i].getOrientation());
@@ -445,7 +445,7 @@ void display(void) {
 	// -----------------------------------------------------------
 	// Animação de uma bola
 	// -----------------------------------------------------------
-	
+
 	// se animação da bola iniciou
 	if (_animationStarted && !_animationFinished) {
 		// move a bola em X e Z
@@ -469,18 +469,18 @@ void display(void) {
 
 void loadSceneLighting(void) {
 	// fonte de luz ambiente
-	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(6.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(7.0f)));
 
 	// fonte de luz direcional
 	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
-	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(4.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(2.0f)));
 	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
 
 	// fonte de luz pontual 
 	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
-	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(6.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(2.0f)));
 	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
 	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
 	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
