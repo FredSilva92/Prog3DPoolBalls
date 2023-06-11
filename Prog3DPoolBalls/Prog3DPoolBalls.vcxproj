@@ -127,20 +127,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LoadShaders.cpp" />
-    <ClCompile Include="PoolBalls.cpp" />
+    <ClCompile Include="Shaders.cpp" />
+    <ClCompile Include="Pool.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\poolballs.frag" />
-    <None Include="shaders\poolballs.vert" />
+    <None Include="shaders\pool.frag" />
+    <None Include="shaders\pool.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LoadShaders.h" />
-    <ClInclude Include="PoolBalls.h" />
+    <ClInclude Include="Shaders.h" />
+    <ClInclude Include="Pool.h" />
     <ClInclude Include="Source.h" />
-    <ClInclude Include="thirdParty\StbImage.h" />
-    <ClInclude Include="thirdParty\TinyObjLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

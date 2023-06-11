@@ -21,8 +21,8 @@
 #include <glm\gtc\matrix_inverse.hpp>
 
 #include "Source.h"
-#include "LoadShaders.h"
-#include "PoolBalls.h"
+#include "Shaders.h"
+#include "Pool.h"
 
 #pragma endregion
 
@@ -37,13 +37,15 @@ GLuint _tableVBO;
 
 // bolas
 const int _numberOfBalls = 15;
-PoolBalls::RendererBall _rendererBalls[_numberOfBalls];
+Pool::RendererBall _rendererBalls[_numberOfBalls];
 
 // shaders
 GLuint _programShader;
 
 // câmara
-glm::mat4 _model, _view, _projection;
+glm::mat4 _modelMatrix;
+glm::mat4 _viewMatrix;
+glm::mat4 _projectionMatrix;
 glm::mat3 _normalMatrix;
 GLfloat _angle = 0.0f;
 glm::vec3 _cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
@@ -293,18 +295,17 @@ void init(void) {
 	glBindVertexArray(_tableVAO);
 
 	// carrega o modelo, material e textura de cada bola
+	// e envia os dados para a GPU
 	for (int i = 0; i < _numberOfBalls; i++) {
 		std::string objFilepath = "textures/Ball" + std::to_string(i + 1) + ".obj";
 		_rendererBalls[i].Read(objFilepath);
 		_rendererBalls[i].Send();
 	}
 
-	//_rendererBalls.Send();
-
 	// cria informações dos shaders
 	ShaderInfo shaders[] = {
-		{ GL_VERTEX_SHADER,   "shaders/poolballs.vert" },
-		{ GL_FRAGMENT_SHADER, "shaders/poolballs.frag" },
+		{ GL_VERTEX_SHADER,   "shaders/pool.vert" },
+		{ GL_FRAGMENT_SHADER, "shaders/pool.frag" },
 		{ GL_NONE, NULL }
 	};
 
@@ -317,51 +318,25 @@ void init(void) {
 		exit(EXIT_FAILURE);
 	}
 
-	// vincula o programa shader ao contexto OpenGL atual
-	glUseProgram(_programShader);
-
-	// obtém as localizações dos atributos no programa shader
-	GLint positionId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "vPosition");
-	GLint normalId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "vNormal");
-	GLint textCoordId = glGetProgramResourceLocation(_programShader, GL_PROGRAM_INPUT, "vTextureCoords");
-
-	// faz a ligação entre os atributos do programa shader ao VAO e VBO ativos 
-	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(normalId, 3 /*3 elementos por cor*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glVertexAttribPointer(textCoordId, 2 /*3 elementos por coordenadas da textura*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-
-	// ativa os atributos do programa shader ao VAO ativo
-	glEnableVertexAttribArray(positionId);
-	glEnableVertexAttribArray(normalId);
-	glEnableVertexAttribArray(textCoordId);
+	bindProgramShader(&_programShader);
+	sendAttributesToProgramShader(&_programShader);
 
 	// matrizes de transformação
-	_model = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.0f, 1.0f, 0.0f));
-	_view = glm::lookAt(
+	_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	_viewMatrix = glm::lookAt(
 		_cameraPosition,				// eye (posição da câmara).
 		glm::vec3(0.0f, 0.0f, 0.0f),	// center (para onde está a "olhar")
 		glm::vec3(0.0f, 1.0f, 0.0f)		// up
 	);
-	glm::mat4 modelView = _view * _model;
-	_projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	_normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
+	glm::mat4 modelViewMatrix = _viewMatrix * _modelMatrix;
+	_projectionMatrix = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	_normalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
 
-	// obtém as localizações dos uniforms no programa shader
-	GLint modelId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "Model");
-	GLint viewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "View");
-	GLint modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
-	GLint projectionId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "Projection");
-	GLint normalViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "NormalMatrix");
-
-	// atribui o valor aos uniforms do programa shader
-	glProgramUniformMatrix4fv(_programShader, modelId, 1, GL_FALSE, glm::value_ptr(_model));
-	glProgramUniformMatrix4fv(_programShader, viewId, 1, GL_FALSE, glm::value_ptr(_view));
-	glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
-	glProgramUniformMatrix4fv(_programShader, projectionId, 1, GL_FALSE, glm::value_ptr(_projection));
-	glProgramUniformMatrix3fv(_programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(_normalMatrix));
+	sendUniformsToProgramShader(&_programShader, &_modelMatrix, &_viewMatrix, &modelViewMatrix, &_projectionMatrix, &_normalMatrix);
 
 	//_rendererBalls.setProgramShader(_programShader);
 
+	// carrega os diferentes tipos de luzes da cena
 	LoadSceneLighting();
 
 	// define a janela de renderização
@@ -377,10 +352,10 @@ void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// translação da mesa
-	glm::mat4 translatedModel = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f));
+	glm::mat4 translatedModel = glm::translate(_modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// modelo de visualização do objeto
-	glm::mat4 modelView = _view * translatedModel;
+	glm::mat4 modelView = _viewMatrix * translatedModel;
 
 	// obtém a localização do uniform
 	GLint modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
@@ -401,7 +376,7 @@ void display(void) {
 	// desenha para cada bola
 	for (int i = 0; i < _numberOfBalls; i++) {
 		// translação da bola
-		translatedModel = glm::translate(_model, _ballPositions[i]);
+		translatedModel = glm::translate(_modelMatrix, _ballPositions[i]);
 
 		// rotação da bola em torno do eixo Z
 		glm::mat4 rotatedModel = glm::rotate(translatedModel, glm::radians(_ballRotations[i]), glm::vec3(0.0f, 0.0f, 1.0f));	// rotação no eixo z
@@ -412,11 +387,11 @@ void display(void) {
 		glm::mat4 scaledModel = glm::scale(rotatedModel, glm::vec3(0.08f));
 
 		// modelo de visualização do objeto
-		modelView = _view * scaledModel;
+		modelView = _viewMatrix * scaledModel;
 
 		//_rendererBalls.Draw(_ballPositions[i], glm::vec3(0));
 
-		PoolBalls::Material material = _rendererBalls[i].getBallMaterial();
+		Pool::Material material = _rendererBalls[i].getBallMaterial();
 		_rendererBalls[i].LoadMaterialLighting(_programShader, material);
 
 		// obtém a localização do uniform
@@ -528,7 +503,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	// Calculate the zoom factor based on the scroll offset
 	float zoomFactor = 1.0f + static_cast<float>(yoffset) * _zoomSpeed;
 
-	_view = glm::scale(_view, glm::vec3(zoomFactor, zoomFactor, 1.0f));
+	_viewMatrix = glm::scale(_viewMatrix, glm::vec3(zoomFactor, zoomFactor, 1.0f));
 
 	_zoomLevel += yoffset * _zoomSpeed;
 	_zoomLevel = std::max(_minZoom, std::min(_maxZoom, _zoomLevel));
@@ -560,13 +535,13 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	float sensitivity = 0.1f;
 
 	// Aplicar rotação horizontal 
-	_view = glm::rotate(_view, glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f));
+	_viewMatrix = glm::rotate(_viewMatrix, glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// Calcular o vetor direito da câmera
-	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(_view[2])));
+	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(_viewMatrix[2])));
 
 	// Aplicar rotação vertical 
-	_view = glm::rotate(_view, glm::radians(yOffset), right);
+	_viewMatrix = glm::rotate(_viewMatrix, glm::radians(yOffset), right);
 }
 
 void charCallback(GLFWwindow* window, unsigned int codepoint)

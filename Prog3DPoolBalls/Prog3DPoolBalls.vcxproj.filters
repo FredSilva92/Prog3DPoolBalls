@@ -21,32 +21,26 @@
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LoadShaders.cpp">
+    <ClCompile Include="Shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PoolBalls.cpp">
+    <ClCompile Include="Pool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\poolballs.vert">
+    <None Include="shaders\pool.vert">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="shaders\poolballs.frag">
+    <None Include="shaders\pool.frag">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LoadShaders.h">
+    <ClInclude Include="Shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PoolBalls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdParty\TinyObjLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdParty\StbImage.h">
+    <ClInclude Include="Pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source.h">
