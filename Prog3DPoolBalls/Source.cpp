@@ -36,7 +36,8 @@ GLuint _tableVAO;
 GLuint _tableVBO;
 
 // bolas
-PoolBalls::RendererBalls _rendererBalls(15);
+const int _numberOfBalls = 15;
+PoolBalls::RendererBall _rendererBalls[_numberOfBalls];
 
 // shaders
 GLuint _programShader;
@@ -292,12 +293,13 @@ void init(void) {
 	glBindVertexArray(_tableVAO);
 
 	// carrega o modelo, material e textura de cada bola
-	for (int i = 1; i <= _rendererBalls.getNumberOfBalls(); i++) {
-		std::string objFilepath = "textures/Ball" + std::to_string(i) + ".obj";
-		_rendererBalls.Read(objFilepath);
+	for (int i = 0; i < _numberOfBalls; i++) {
+		std::string objFilepath = "textures/Ball" + std::to_string(i + 1) + ".obj";
+		_rendererBalls[i].Read(objFilepath);
+		_rendererBalls[i].Send();
 	}
 
-	_rendererBalls.Send();
+	//_rendererBalls.Send();
 
 	// cria informações dos shaders
 	ShaderInfo shaders[] = {
@@ -360,7 +362,7 @@ void init(void) {
 
 	//_rendererBalls.setProgramShader(_programShader);
 
-	_rendererBalls.loadLightingUniforms(_programShader);
+	LoadSceneLighting();
 
 	// define a janela de renderização
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -397,7 +399,7 @@ void display(void) {
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
 
 	// desenha para cada bola
-	for (int i = 0; i < _rendererBalls.getNumberOfBalls(); i++) {
+	for (int i = 0; i < _numberOfBalls; i++) {
 		// translação da bola
 		translatedModel = glm::translate(_model, _ballPositions[i]);
 
@@ -414,8 +416,8 @@ void display(void) {
 
 		//_rendererBalls.Draw(_ballPositions[i], glm::vec3(0));
 
-		PoolBalls::Material material = _rendererBalls.getBallsMaterials()[i];
-		_rendererBalls.loadMaterialUniforms(_programShader, material);
+		PoolBalls::Material material = _rendererBalls[i].getBallMaterial();
+		_rendererBalls[i].LoadMaterialLighting(_programShader, material);
 
 		// obtém a localização do uniform
 		modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
@@ -429,7 +431,7 @@ void display(void) {
 
 		// desenha a bola na tela
 		glBindVertexArray(0);
-		glDrawArrays(GL_TRIANGLES, 0, _rendererBalls.getBallsVertices()[i].size() / 8);
+		glDrawArrays(GL_TRIANGLES, 0, _rendererBalls[i].getBallVertices().size() / 8);
 	}
 
 	// se animação da bola iniciou
@@ -450,13 +452,48 @@ void display(void) {
 	}
 }
 
-bool isColliding() {
+void LoadSceneLighting(void) {
+	// fonte de luz ambiente
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(6.0f)));
+
+	// fonte de luz direcional
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
+
+	// fonte de luz pontual 
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
+
+	// fonte de luz cónica
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.position"), 1, glm::value_ptr(glm::vec3(0.0f, 2.2f, 0.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.direction"), 1, glm::value_ptr(glm::vec3(0.0f, -0.1f, 0.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.constant"), 1.0f);
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.linear"), 0.09f);
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.quadratic"), 0.032f);
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.cutOff"), glm::cos(glm::radians(20.0f)));
+	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.outerCutOff"), glm::cos(glm::radians(30.0f)));
+
+	// define a luz padrão apresentada
+	glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), 1);
+}
+
+bool isColliding(void) {
 	float _ballRadius = 0.08f;
 
 	for (int i = 0; i < _ballPositions.size(); i++) {
 		if (i != animatedballIndex) {
 			float distance = glm::distance(_ballPositions[i], _ballPositions[animatedballIndex]);
-		
+
 			// se colidiu com alguma bola
 			if (distance <= 2 * _ballRadius) {
 				return true;

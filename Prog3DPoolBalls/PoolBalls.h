@@ -44,29 +44,25 @@ namespace PoolBalls {
 	} Texture;
 
 	// classe base da biblioteca
-	class RendererBalls {
+	class RendererBall {
 	private:
-		// atributos
-		const GLuint _numberOfBalls;
-		std::vector<std::vector<float>> _ballsVertices;
-		GLuint* _ballsVAOs;
-		GLuint* _ballsVBOs;
-		std::vector<Material> _ballsMaterials;
-		std::vector<Texture> _ballsTextures;
+		// atributos privados
+		const char* _objFilepath;
+		std::vector<float> _ballVertices;
+		GLuint* _ballVAO;
+		GLuint* _ballVBO;
+		Material _ballMaterial;
+		Texture _ballTexture;
 		//GLuint _programShader;
 
 	public:
 		// aceder atributos fora da classe - getters
-		GLuint getNumberOfBalls() const {
-			return _numberOfBalls;
+		const std::vector<float>& getBallVertices() const {	// retorna apontador para ser mais eficiente no draw
+			return _ballVertices;
 		}
 
-		const std::vector<std::vector<float>>& getBallsVertices() const {	// retorna apontador para ser mais eficiente no draw
-			return _ballsVertices;
-		}
-
-		const std::vector<Material>& getBallsMaterials() const {
-			return _ballsMaterials;
+		const Material& getBallMaterial() const {
+			return _ballMaterial;
 		}
 
 		//GLuint getProgramShader() const {
@@ -79,19 +75,18 @@ namespace PoolBalls {
 		//}
 
 		// construtor
-		RendererBalls(GLuint numberOfBalls) : _numberOfBalls(numberOfBalls) {
-			_ballsVAOs = new GLuint[_numberOfBalls];
-			_ballsVBOs = new GLuint[_numberOfBalls];
+		RendererBall() {
+			_ballVAO = new GLuint;
+			_ballVBO = new GLuint;
 			//_programShader = -1;
 		}
 
 		// destrutor
-		~RendererBalls() {
+		~RendererBall() {
 			// liberta memória
-			delete[] _ballsVAOs;
-			delete[] _ballsVBOs;
-			_ballsVertices.clear();
-			_ballsMaterials.clear();
+			delete[] _ballVAO;
+			delete[] _ballVBO;
+			_ballVertices.clear();
 		}
 
 		// principais
@@ -104,8 +99,7 @@ namespace PoolBalls {
 		std::string getMtlFromObj(const char* objFilepath);
 		Material loadMaterial(const char* mtlFilename);
 		Texture loadTexture(std::string imageFilename);
-		void loadMaterialUniforms(GLuint programShader, Material material);
-		void loadLightingUniforms(GLuint programShader);
+		void LoadMaterialLighting(GLuint programShader, Material material);
 	};
 
 #pragma endregion

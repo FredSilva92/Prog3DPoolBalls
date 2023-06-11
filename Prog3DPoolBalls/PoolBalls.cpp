@@ -37,7 +37,9 @@ namespace PoolBalls {
 
 #pragma region funções principais da biblioteca PoolBalls
 
-	void RendererBalls::Read(const std::string obj_model_filepath) {
+	void RendererBall::Read(const std::string obj_model_filepath) {
+		_objFilepath = obj_model_filepath.c_str();
+
 		std::vector<float> vertices;
 
 		tinyobj::attrib_t attributes;
@@ -46,8 +48,9 @@ namespace PoolBalls {
 		std::string warning, error;
 
 		// se houve erros ao carregar o ficheiro .obj
-		if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warning, &error, obj_model_filepath.c_str())) {
+		if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warning, &error, _objFilepath)) {
 			std::cout << warning << error << '\n';
+			return;
 		}
 
 		// lê atributos do modelo 3D
@@ -82,38 +85,35 @@ namespace PoolBalls {
 			}
 		}
 
-		// armazena o modelo 3d
-		_ballsVertices.push_back(load3dModel(obj_model_filepath.c_str()));
+		// armazena o modelo 3D
+		_ballVertices = load3dModel(_objFilepath);
 
 		// armazena o material
-		std::string mtlFilename = getMtlFromObj(obj_model_filepath.c_str());
-		_ballsMaterials.push_back(loadMaterial(mtlFilename.c_str()));
+		std::string mtlFilename = getMtlFromObj(_objFilepath);
+		_ballMaterial = loadMaterial(mtlFilename.c_str());
 
 		// armazena a textura
-		int lastIndex = _ballsMaterials.size() - 1;
-		std::string textureFilename = _ballsMaterials[lastIndex].map_kd;
-		_ballsTextures.push_back(loadTexture(textureFilename));
+		std::string textureFilename = _ballMaterial.map_kd;
+		_ballTexture = loadTexture(textureFilename);
 	}
 
-	void RendererBalls::Send(void) {
-		// gera nomes para os VAOs das bolas
-		glGenVertexArrays(_numberOfBalls, _ballsVAOs);
+	void RendererBall::Send(void) {
+		// gera o nome para o VAO da bola
+		glGenVertexArrays(1, _ballVAO);
 
-		// vincula o VAO de cada bola ao contexto OpenGL atual
-		for (int i = 0; i < _numberOfBalls; i++) {
-			glBindVertexArray(_ballsVAOs[i]);
-		}
+		// vincula o VAO da bola ao contexto OpenGL atual
+		glBindVertexArray(*_ballVAO);
 
-		// gera nomes para os VBOs das bolas
-		glGenBuffers(_numberOfBalls, _ballsVBOs);
+		// gera o nome para o VBO da bola
+		glGenBuffers(1, _ballVBO);
 
-		// cria e configura cada VBO das bolas
-		for (int i = 0; i < _ballsVertices.size(); i++) {
+		// para cada vértice da da bola
+		for (int i = 0; i < _ballVertices.size(); i++) {
 			// vincula o VBO ao contexto OpenGL atual
-			glBindBuffer(GL_ARRAY_BUFFER, _ballsVBOs[i]);
+			glBindBuffer(GL_ARRAY_BUFFER, *_ballVBO);
 
-			// inicializa o vbo atualmente ativo com dados imutáveis
-			glBufferStorage(GL_ARRAY_BUFFER, _ballsVertices[i].size() * sizeof(float), _ballsVertices[i].data(), 0);
+			// inicializa o VBO atualmente ativo com dados imutáveis
+			glBufferStorage(GL_ARRAY_BUFFER, _ballVertices.size() * sizeof(float), _ballVertices.data(), 0);
 
 			// ativa atributos das posições dos vértices
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
@@ -132,32 +132,33 @@ namespace PoolBalls {
 		}
 
 		// gera nomes para as texturas
-		std::vector<GLuint> textureNames(_numberOfBalls);
-		glGenTextures(_numberOfBalls, textureNames.data());
+		GLuint textureName;
+		glGenTextures(1, &textureName);
 
-		// atribui a textura de cada bola
-		for (int i = 0; i < _numberOfBalls; i++) {
-			// ativa a unidade de textura atual (inicia na unidade 0)
-			glActiveTexture(GL_TEXTURE0 + i);
+		// saber atual unidade de textura para ativar a próxima
+		GLint currentTextureUnits;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &currentTextureUnits);
 
-			// vincula um nome de textura ao target GL_TEXTURE_2D da unidade de textura ativa
-			glBindTexture(GL_TEXTURE_2D, textureNames[i]);
+		// ativa a unidade de textura atual (inicia na unidade 0)
+		glActiveTexture(GL_TEXTURE0 + currentTextureUnits);
 
-			// define os parâmetros de filtragem (wrapping e ajuste de tamanho)
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		// vincula um nome de textura ao target GL_TEXTURE_2D da unidade de textura ativa
+		glBindTexture(GL_TEXTURE_2D, textureName);
 
-			// carrega os dados da imagem para o objeto de textura vinculado ao target GL_TEXTURE_2D da unidade de textura ativa
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _ballsTextures[0].width, _ballsTextures[i].height, 0, _ballsTextures[i].nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, _ballsTextures[i].image);
+		// define os parâmetros de filtragem (wrapping e ajuste de tamanho)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			// gera o mipmap para essa textura
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
+		// carrega os dados da imagem para o objeto de textura vinculado ao target GL_TEXTURE_2D da unidade de textura ativa
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _ballTexture.width, _ballTexture.height, 0, _ballTexture.nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, _ballTexture.image);
+
+		// gera o mipmap para essa textura
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
-	void RendererBalls::Draw(glm::vec3 position, glm::vec3 orientation) {
+	void RendererBall::Draw(glm::vec3 position, glm::vec3 orientation) {
 
 	}
 
@@ -166,7 +167,7 @@ namespace PoolBalls {
 
 #pragma region funções secundárias da biblioteca PoolBalls
 
-	std::vector<float> RendererBalls::load3dModel(const char* objFilepath) {
+	std::vector<float> RendererBall::load3dModel(const char* objFilepath) {
 		std::vector<float> vertices;
 
 		tinyobj::attrib_t attributes;
@@ -215,7 +216,7 @@ namespace PoolBalls {
 		return vertices;
 	}
 
-	std::string RendererBalls::getMtlFromObj(const char* objFilepath) {
+	std::string RendererBall::getMtlFromObj(const char* objFilepath) {
 		std::ifstream file(objFilepath);
 		std::string line;
 		std::string mtlFilename;
@@ -234,7 +235,7 @@ namespace PoolBalls {
 		return mtlFilename;
 	}
 
-	Material RendererBalls::loadMaterial(const char* mtlFilename) {
+	Material RendererBall::loadMaterial(const char* mtlFilename) {
 		std::string directory = "textures/";
 		std::ifstream mtlFile(directory + mtlFilename);
 
@@ -299,7 +300,7 @@ namespace PoolBalls {
 		return material;
 	}
 
-	Texture RendererBalls::loadTexture(std::string imageFilename) {
+	Texture RendererBall::loadTexture(std::string imageFilename) {
 		Texture texture{};
 		int width, height, nChannels;
 
@@ -331,46 +332,11 @@ namespace PoolBalls {
 		return texture;
 	}
 
-	void RendererBalls::loadMaterialUniforms(GLuint programShader, Material material) {
+	void RendererBall::LoadMaterialLighting(GLuint programShader, Material material) {
 		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.shininess"), material.ns);
 		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.ambient"), 1, glm::value_ptr(material.ka));
 		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.diffuse"), 1, glm::value_ptr(material.kd));
 		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "material.specular"), 1, glm::value_ptr(material.ks));
-	}
-
-	void RendererBalls::loadLightingUniforms(GLuint programShader) {
-		// fonte de luz ambiente
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(6.0f)));
-
-		// fonte de luz direcional
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
-
-		// fonte de luz pontual 
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
-
-		// fonte de luz cónica
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.position"), 1, glm::value_ptr(glm::vec3(0.0f, 2.2f, 0.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.direction"), 1, glm::value_ptr(glm::vec3(0.0f, -0.1f, 0.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
-		glProgramUniform3fv(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.constant"), 1.0f);
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.linear"), 0.09f);
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.quadratic"), 0.032f);
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.cutOff"), glm::cos(glm::radians(20.0f)));
-		glProgramUniform1f(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "spotLight.outerCutOff"), glm::cos(glm::radians(30.0f)));
-
-		// define a luz padrão apresentada
-		glProgramUniform1i(programShader, glGetProgramResourceLocation(programShader, GL_UNIFORM, "lightModel"), 1);
 	}
 
 #pragma endregion

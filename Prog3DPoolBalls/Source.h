@@ -23,6 +23,7 @@
 
 	void init(void);
 	void display(void);
+	void LoadSceneLighting(void);
 	bool isColliding(void);
 
 #pragma endregion
