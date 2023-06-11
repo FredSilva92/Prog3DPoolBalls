@@ -129,6 +129,10 @@ int main()
 #pragma region funções do programa
 
 void init(void) {
+	// -----------------------------------------------------------
+	// Carregar dados da mesa para CPU
+	// -----------------------------------------------------------
+	
 	// posição da mesa
 	float xCoord = 1.25f;
 	float yCoord = 0.25f;
@@ -150,9 +154,9 @@ void init(void) {
 
 	// cria atributos dos vértices da mesa
 	GLfloat _tableVertices[_numberOfTableVertices * 8] = {
-		//*************************************************
-		//                       X+ (face #0)
-		// ************************************************
+		// -----------------------------------------------------------
+		// X+ (face 1)
+		// -----------------------------------------------------------
 		// Primeiro triângulo
 		// Posições						Cores											Coordenadas de textura
 		xCoord, -yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],		xTexture, yTexture,
@@ -162,9 +166,10 @@ void init(void) {
 		xCoord,  yCoord,  zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
 		xCoord, -yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
 		xCoord,  yCoord, -zCoord,		colors[0][0], colors[0][1], colors[0][2],       xTexture, yTexture,
-		// ************************************************
-		//                       X- (face #1)
-		// ************************************************
+
+		// -----------------------------------------------------------
+		// X- (face 2)
+		// -----------------------------------------------------------
 		// Primeiro triângulo
 		-xCoord, -yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
 		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
@@ -173,9 +178,10 @@ void init(void) {
 		-xCoord,  yCoord, -zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
 		-xCoord, -yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
 		-xCoord,  yCoord,  zCoord,		colors[1][0], colors[1][1], colors[1][2],		xTexture, yTexture,
-		// ************************************************
-		//                       Y+ (face #2)
-		// ************************************************
+
+		// -----------------------------------------------------------
+		// Y+ (face 3)
+		// -----------------------------------------------------------
 		// Primeiro triângulo
 		-xCoord, yCoord, zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
 		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
@@ -184,9 +190,10 @@ void init(void) {
 		-xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
 		xCoord, yCoord, zCoord,			colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
 		xCoord, yCoord, -zCoord,		colors[2][0], colors[2][1], colors[2][2],      xTexture, yTexture,
-		// ************************************************
-		//                       Y- (face #3)
-		// ************************************************
+
+		// -----------------------------------------------------------
+		// Y- (face 4)
+		// -----------------------------------------------------------
 		// Primeiro triângulo
 		-xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
 		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
@@ -195,9 +202,10 @@ void init(void) {
 		-xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
 		xCoord, -yCoord, -zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
 		xCoord, -yCoord, zCoord,		colors[3][0], colors[3][1], colors[3][2],		xTexture, yTexture,
-		// ************************************************
-		//                       Z+ (face #4)
-		// ************************************************
+
+		// -----------------------------------------------------------
+		// Z+ (face 5)
+		// -----------------------------------------------------------
 		// Primeiro triângulo
 		-xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
 		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
@@ -206,9 +214,10 @@ void init(void) {
 		-xCoord, yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
 		xCoord, -yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
 		xCoord,  yCoord, zCoord,		colors[4][0], colors[4][1], colors[4][2],      xTexture, yTexture,
-		// ************************************************
-		//                       Z- (face #5)
-		// ************************************************
+
+		// -----------------------------------------------------------
+		// Z- (face 6)
+		// -----------------------------------------------------------
 		// Primeiro triângulo
 		xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
 		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
@@ -218,6 +227,11 @@ void init(void) {
 		-xCoord, -yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture,
 		-xCoord, yCoord, -zCoord,		colors[5][0], colors[5][1], colors[5][2],      xTexture, yTexture
 	};
+
+
+	// -----------------------------------------------------------
+	// Enviar dados da mesa para GPU
+	// -----------------------------------------------------------
 
 	// gera o nome para o VAO da mesa
 	glGenVertexArrays(1, &_tableVAO);
@@ -248,6 +262,11 @@ void init(void) {
 
 	// desvincula o VAO atual
 	glBindVertexArray(_tableVAO);
+
+
+	// -----------------------------------------------------------
+	// Carregar dados das bolas para CPU
+	// -----------------------------------------------------------
 
 	// posições das bolas
 	std::vector<glm::vec3> _positions = {
@@ -287,23 +306,31 @@ void init(void) {
 		glm::vec3(0.0f),		// bola 15
 	};
 
-	// para cada bola, instancia com um identificador único
-	// carrega o modelo, material e textura,
-	// envia os dados para a GPU,
-	// e define a posição e orientação na cena
+	// para cada bola, define um identificador único, posição e orientação,
+	// carrega o modelo, material e textura e envia os dados para a GPU,
 	for (int i = 0; i < _numberOfBalls; i++) {
 		_rendererBalls[i].setId(i + 1);
 
 		std::string objFilepath = "textures/Ball" + std::to_string(i + 1) + ".obj";
 		_rendererBalls[i].Read(objFilepath);
 
-		_rendererBalls[i].Send();
-
 		_rendererBalls[i].setPosition(_positions[i]);
 		_rendererBalls[i].setOrientation(_orientations[i]);
+
+
+		// -----------------------------------------------------------
+		// Enviar dados das bolas para GPU
+		// -----------------------------------------------------------
+
+		_rendererBalls[i].Send();
 	}
 
-	// cria informações dos shaders
+
+	// -----------------------------------------------------------
+	// Carregar shaders para CPU
+	// -----------------------------------------------------------
+
+	// informações dos shaders
 	ShaderInfo shaders[] = {
 		{ GL_VERTEX_SHADER,   "shaders/pool.vert" },
 		{ GL_FRAGMENT_SHADER, "shaders/pool.frag" },
@@ -318,6 +345,11 @@ void init(void) {
 		std::cout << "Erro ao carregar shaders: " << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
+
+	// -----------------------------------------------------------
+	// Envia shaders para GPU
+	// -----------------------------------------------------------
 
 	// vincula o programa shader
 	Pool::bindProgramShader(&Pool::_programShader);
@@ -342,6 +374,11 @@ void init(void) {
 	// carrega os diferentes tipos de luzes da cena
 	loadSceneLighting();
 
+
+	// -----------------------------------------------------------
+	// Configurar janela de renderização
+	// -----------------------------------------------------------
+
 	// define a janela de renderização
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -351,8 +388,17 @@ void init(void) {
 }
 
 void display(void) {
+	// -----------------------------------------------------------
+	// Limpar buffers
+	// -----------------------------------------------------------
+	
 	// limpa o buffer de cor e de profundidade
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+	// -----------------------------------------------------------
+	// Desenhar mesa
+	// -----------------------------------------------------------
 
 	// translação da mesa
 	glm::mat4 translatedModel = glm::translate(Pool::_modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -376,11 +422,21 @@ void display(void) {
 	glBindVertexArray(_tableVAO);
 	glDrawArrays(GL_TRIANGLES, 0, _numberOfTableVertices);
 
+
+	// -----------------------------------------------------------
+	// Desenhar bolas
+	// -----------------------------------------------------------
+	
 	// desenha para cada bola
 	for (int i = 0; i < _numberOfBalls; i++) {
 		_rendererBalls[i].Draw(_rendererBalls[i].getPosition(), _rendererBalls[i].getOrientation());
 	}
 
+
+	// -----------------------------------------------------------
+	// Animação de uma bola
+	// -----------------------------------------------------------
+	
 	// se animação da bola iniciou
 	if (_animationStarted && !_animationFinished) {
 		// move a bola em X e Z
