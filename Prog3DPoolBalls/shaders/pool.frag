@@ -213,37 +213,3 @@ vec4 calcSpotLight(SpotLight light) {
 
     return vec4(ambient + diffuse + specular, 1.0f);
 }
-
-// VersaoAntiga
-vec4 calcSpotLight2(SpotLight light) {
-    // Ambient
-    vec3 ambient =  material.ambient * light.ambient;
-
-    // Diffuse
-    vec3 norm = normalize(color);
-    vec3 lightDir = normalize(light.position - fragPos);
-    float diff = max(dot(norm, lightDir), 0.0);
-    //vec3 diffuse = light.diffuse * diff;
-    
-	// cálculo da contribuição da luz difusa
-	float diffuseIntensity = max(dot(norm, lightDir), 0.0);
-	float smoothDiffuse = smoothstep(light.outerCutOff, light.cutOff, diffuseIntensity);
-	vec3 diffuse = light.diffuse * smoothDiffuse;
-
-	// cálculo da contribuição da luz especular
-	vec3 viewDir = normalize(viewPosition - fragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	float smoothSpecular = smoothstep(light.outerCutOff, light.cutOff, diffuseIntensity);
-	vec3 specular = light.specular * spec * smoothSpecular;
-
-	// attenuation
-	float distance    = length(light.position - fragPos);
-	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-
-	ambient  *= attenuation;
-	diffuse  *= attenuation;
-	specular *= attenuation;
-
-    return vec4(ambient + diffuse + specular, 1.0f);
-}

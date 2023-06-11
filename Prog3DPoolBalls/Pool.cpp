@@ -159,52 +159,7 @@ namespace Pool {
 #pragma region funções principais da classe RendererBall
 
 	void RendererBall::Read(const std::string obj_model_filepath) {
-		std::vector<float> vertices;
-
-		tinyobj::attrib_t attributes;
-		std::vector<tinyobj::shape_t> shapes;
-		std::vector<tinyobj::material_t> materials;
-		std::string warning, error;
-
 		_objFilepath = obj_model_filepath.c_str();
-
-		// se houve erros ao carregar o ficheiro .obj
-		if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warning, &error, _objFilepath)) {
-			std::cout << warning << error << '\n';
-			return;
-		}
-
-		// lê atributos do modelo 3D
-		for (const auto& shape : shapes) {
-			for (const auto& index : shape.mesh.indices) {
-				glm::vec4 pos = {
-					attributes.vertices[3 * index.vertex_index],
-					attributes.vertices[3 * index.vertex_index + 1],
-					attributes.vertices[3 * index.vertex_index + 2],
-					1
-				};
-
-				glm::vec3 normal = {
-					attributes.normals[3 * index.normal_index],
-					attributes.normals[3 * index.normal_index + 1],
-					attributes.normals[3 * index.normal_index + 2]
-				};
-
-				glm::vec2 textCoord = {
-					attributes.texcoords[2 * index.texcoord_index],
-					attributes.texcoords[2 * index.texcoord_index + 1]
-				};
-
-				vertices.push_back(pos.x);
-				vertices.push_back(pos.y);
-				vertices.push_back(pos.z);
-				vertices.push_back(normal.x);
-				vertices.push_back(normal.y);
-				vertices.push_back(normal.z);
-				vertices.push_back(textCoord.x);
-				vertices.push_back(textCoord.y);
-			}
-		}
 
 		// armazena o modelo 3D
 		_vertices = load3dModel(_objFilepath);
