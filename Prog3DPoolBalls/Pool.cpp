@@ -57,7 +57,7 @@ namespace Pool {
 		// obtém as localizações dos atributos no programa shader
 		GLint positionId = glGetProgramResourceLocation(*programShader, GL_PROGRAM_INPUT, "vPosition");
 		GLint normalId = glGetProgramResourceLocation(*programShader, GL_PROGRAM_INPUT, "vNormal");
-		GLint textCoordId = glGetProgramResourceLocation(*programShader, GL_PROGRAM_INPUT, "vTextureCoords");
+		GLint textCoordId = glGetProgramResourceLocation(*programShader, GL_PROGRAM_INPUT, "vTextureCoord");
 
 		// faz a ligação entre os atributos do programa shader aos VAOs e VBO ativos 
 		glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -202,12 +202,12 @@ namespace Pool {
 			// ativa atributos das coordenadas de textura dos vértices
 			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
 			glEnableVertexAttribArray(2);
-
+		
 			// desvincula o VAO atual
 			glBindVertexArray(0);
 		}
 
-		// gera nomes para as texturas
+		// gera o nome para a textura
 		GLuint textureName;
 		glGenTextures(1, &textureName);
 
@@ -220,8 +220,8 @@ namespace Pool {
 		// define os parâmetros de filtragem (wrapping e ajuste de tamanho)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		// carrega os dados da imagem para o objeto de textura vinculado ao target GL_TEXTURE_2D da unidade de textura ativa
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _texture->width, _texture->height, 0, _texture->nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, _texture->image);
@@ -231,6 +231,7 @@ namespace Pool {
 	}
 
 	void RendererBall::Draw(glm::vec3 position, glm::vec3 orientation) {
+		// atualizar valores de iluminação do objeto
 		Material* material = _material;
 		loadMaterialLighting(_programShader, *material);
 
@@ -239,8 +240,8 @@ namespace Pool {
 
 		// rotação da bola em torno do eixo Z
 		glm::mat4 rotatedModel = glm::rotate(translatedModel, glm::radians(orientation.z), glm::vec3(0.0f, 0.0f, 1.0f));	// rotação no eixo z
-		rotatedModel = glm::rotate(rotatedModel, glm::radians(orientation.y), glm::vec3(0.0f, 1.0f, 0.0f));				// rotação no eixo y
-		rotatedModel = glm::rotate(rotatedModel, glm::radians(orientation.x), glm::vec3(1.0f, 0.0f, 0.0f));				// rotação no eixo x
+		rotatedModel = glm::rotate(rotatedModel, glm::radians(orientation.y), glm::vec3(0.0f, 1.0f, 0.0f));					// rotação no eixo y
+		rotatedModel = glm::rotate(rotatedModel, glm::radians(orientation.x), glm::vec3(1.0f, 0.0f, 0.0f));					// rotação no eixo x
 
 		// escala de cada bola
 		glm::mat4 scaledModel = glm::scale(rotatedModel, glm::vec3(0.08f));
@@ -255,11 +256,10 @@ namespace Pool {
 		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
 		GLint renderTex = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "renderTex");
-		glProgramUniform1i(_programShader, renderTex, 0);
+		glProgramUniform1i(_programShader, renderTex, 1);
 
 		GLint locationTexSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "sampler");
 		glProgramUniform1i(_programShader, locationTexSampler1, (_id - 1)/*unidade de textura*/);
-		glProgramUniform1i(_programShader, renderTex, 1);
 
 		// desenha a bola na tela
 		glBindVertexArray(0);
@@ -418,19 +418,10 @@ namespace Pool {
 			return {};
 		}
 
-		// aloca memória para a imagem
-		unsigned char* imageCopy = new unsigned char[width * height * nChannels];
-
-		// copia a imagem para a nova área de memória
-		std::memcpy(imageCopy, image, width * height * nChannels);
-
 		texture->width = width;
 		texture->height = height;
 		texture->nChannels = nChannels;
-		texture->image = imageCopy;
-
-		// liberta a imagem da memória do CPU
-		stbi_image_free(image);
+		texture->image = image;
 
 		return texture;
 	}

@@ -1,8 +1,8 @@
 #version 440 core
 
 layout(location = 0) in vec3 vPosition;
-layout(location = 1) in vec3 vColors;
-layout(location = 2) in vec2 vTextureCoords;
+layout(location = 1) in vec3 vColor;
+layout(location = 2) in vec2 vTextureCoord;
 
 layout(location = 0) out vec3 color;
 layout(location = 1) out vec2 textureCoord;
@@ -21,15 +21,15 @@ uniform mat3 NormalMatrix;
 void main()
 {
     gl_Position = Projection * ModelView * vec4(vPosition, 1.0);
-    color = vColors;
+    color = vColor;
 
     // Posição do vértice em coordenadas do olho.
 	vPositionEyeSpace = (ModelView * vec4(vPosition, 1.0)).xyz;
 
 	// Transformar a normal do vértice.
-	vNormalEyeSpace = normalize(NormalMatrix * vColors);
+	vNormalEyeSpace = normalize(NormalMatrix * vColor);
 
 	fragPos = vec3(Model * vec4(vPosition, 1.0f));
 
-	textureCoord = vTextureCoords;
+	textureCoord = vTextureCoord;
 }

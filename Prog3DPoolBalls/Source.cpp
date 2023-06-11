@@ -292,7 +292,7 @@ void init(void) {
 	// envia os dados para a GPU,
 	// e define a posição e orientação na cena
 	for (int i = 0; i < _numberOfBalls; i++) {
-		_rendererBalls[i].setId(i);
+		_rendererBalls[i].setId(i + 1);
 
 		std::string objFilepath = "textures/Ball" + std::to_string(i + 1) + ".obj";
 		_rendererBalls[i].Read(objFilepath);
@@ -369,8 +369,8 @@ void display(void) {
 	GLint renderTex = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "renderTex");
 	glProgramUniform1i(Pool::_programShader, renderTex, 0);
 
-	GLint viewPositionLoc = glGetUniformLocation(Pool::_programShader, "viewPosition");
-	glUniform3f(viewPositionLoc, _cameraPosition.x, _cameraPosition.y, _cameraPosition.z);
+	//GLint viewPositionLoc = glGetUniformLocation(Pool::_programShader, "viewPosition");
+	//glUniform3f(viewPositionLoc, _cameraPosition.x, _cameraPosition.y, _cameraPosition.z);
 
 	// desenha a mesa na tela
 	glBindVertexArray(_tableVAO);
@@ -453,7 +453,7 @@ bool isColliding(void) {
 
 	// se colidiu com os limites da mesa
 	if (_rendererBalls[_animatedBallIndex].getPosition().x + _ballRadius >= 1.25f || _rendererBalls[_animatedBallIndex].getPosition().x - _ballRadius <= -1.25f ||
-		_rendererBalls[_animatedBallIndex].getPosition().y + _ballRadius >= 1.25f || _rendererBalls[_animatedBallIndex].getPosition().y - _ballRadius <= -1.25f) {
+		_rendererBalls[_animatedBallIndex].getPosition().z + _ballRadius >= 1.25f || _rendererBalls[_animatedBallIndex].getPosition().z - _ballRadius <= -1.25f) {
 		return true;
 	}
 
