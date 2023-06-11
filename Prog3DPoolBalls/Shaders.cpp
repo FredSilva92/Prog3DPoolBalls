@@ -157,49 +157,4 @@ GLuint loadShaders(ShaderInfo* shaders) {
 	return program;
 }
 
-void bindProgramShader(GLuint* programShader) {
-	// vincula o programa shader ao contexto OpenGL atual
-	glUseProgram(*programShader);
-}
-
-void sendAttributesToProgramShader(GLuint* programShader) {
-	// obtém as localizações dos atributos no programa shader
-	GLint positionId = glGetProgramResourceLocation(*programShader, GL_PROGRAM_INPUT, "vPosition");
-	GLint normalId = glGetProgramResourceLocation(*programShader, GL_PROGRAM_INPUT, "vNormal");
-	GLint textCoordId = glGetProgramResourceLocation(*programShader, GL_PROGRAM_INPUT, "vTextureCoords");
-
-	// faz a ligação entre os atributos do programa shader aos VAOs e VBO ativos 
-	glVertexAttribPointer(positionId, 3 /*3 elementos por vértice*/, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(normalId, 3 /*3 elementos por cor*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glVertexAttribPointer(textCoordId, 2 /*3 elementos por coordenadas da textura*/, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-
-	// ativa os atributos do programa shader
-	glEnableVertexAttribArray(positionId);
-	glEnableVertexAttribArray(normalId);
-	glEnableVertexAttribArray(textCoordId);
-}
-
-void sendUniformsToProgramShader(
-	GLuint* programShader,
-	glm::mat4* modelMatrix,
-	glm::mat4* viewMatrix,
-	glm::mat4* modelViewMatrix,
-	glm::mat4* projectionMatrix,
-	glm::mat3* normalMatrix)
-{
-	// obtém as localizações dos uniforms no programa shader
-	GLint modelId = glGetProgramResourceLocation(*programShader, GL_UNIFORM, "Model");
-	GLint viewId = glGetProgramResourceLocation(*programShader, GL_UNIFORM, "View");
-	GLint modelViewId = glGetProgramResourceLocation(*programShader, GL_UNIFORM, "ModelView");
-	GLint projectionId = glGetProgramResourceLocation(*programShader, GL_UNIFORM, "Projection");
-	GLint normalViewId = glGetProgramResourceLocation(*programShader, GL_UNIFORM, "NormalMatrix");
-
-	// atribui o valor aos uniforms do programa shader
-	glProgramUniformMatrix4fv(*programShader, modelId, 1, GL_FALSE, glm::value_ptr(*modelMatrix));
-	glProgramUniformMatrix4fv(*programShader, viewId, 1, GL_FALSE, glm::value_ptr(*viewMatrix));
-	glProgramUniformMatrix4fv(*programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(*modelViewMatrix));
-	glProgramUniformMatrix4fv(*programShader, projectionId, 1, GL_FALSE, glm::value_ptr(*projectionMatrix));
-	glProgramUniformMatrix3fv(*programShader, normalViewId, 1, GL_FALSE, glm::value_ptr(*normalMatrix));
-}
-
 #pragma endregion

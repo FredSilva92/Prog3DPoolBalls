@@ -319,30 +319,25 @@ void init(void) {
 		exit(EXIT_FAILURE);
 	}
 
-	//// vincula, atribui os atributos e os uniforms ao programa shader para cada bola
-	//for (int i = 0; i < _numberOfBalls; i++) {
-
-	//}
-
 	// vincula o programa shader
-	bindProgramShader(&Pool::_programShader);
+	Pool::bindProgramShader(&Pool::_programShader);
 
 	// atribui os atributos dos vértices ao programa shader
-	sendAttributesToProgramShader(&Pool::_programShader);
+	Pool::sendAttributesToProgramShader(&Pool::_programShader);
 
 	// matrizes de transformação
 	Pool::_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.0f, 1.0f, 0.0f));
 	Pool::_viewMatrix = glm::lookAt(
-		_cameraPosition,				// eye (posição da câmara).
-		glm::vec3(0.0f, 0.0f, 0.0f),	// center (para onde está a "olhar")
-		glm::vec3(0.0f, 1.0f, 0.0f)		// up
+		_cameraPosition,				// posição da câmara
+		glm::vec3(0.0f, 0.0f, 0.0f),	// para onde está a "olhar"
+		glm::vec3(0.0f, 1.0f, 0.0f)		// orientação vertical na qual a câmera está a "olha"
 	);
 	glm::mat4 modelViewMatrix = Pool::_viewMatrix * Pool::_modelMatrix;
 	Pool::_projectionMatrix = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 	Pool::_normalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
 
 	// atribui as matrizes de transformação ao programa shader
-	sendUniformsToProgramShader(&Pool::_programShader, &Pool::_modelMatrix, &Pool::_viewMatrix, &modelViewMatrix, &Pool::_projectionMatrix, &Pool::_normalMatrix);
+	Pool::sendUniformsToProgramShader(&Pool::_programShader, &Pool::_modelMatrix, &Pool::_viewMatrix, &modelViewMatrix, &Pool::_projectionMatrix, &Pool::_normalMatrix);
 
 	// carrega os diferentes tipos de luzes da cena
 	loadSceneLighting();
@@ -384,67 +379,6 @@ void display(void) {
 	// desenha para cada bola
 	for (int i = 0; i < _numberOfBalls; i++) {
 		_rendererBalls[i].Draw(_rendererBalls[i].getPosition(), _rendererBalls[i].getOrientation());
-
-		//Pool::Material material = _rendererBalls[i].getBallMaterial();
-
-		////std::cout << _rendererBalls[i].getBallMaterial().map_kd << std::endl;
-		//std::cout << material.map_kd << std::endl;
-
-		//_rendererBalls[i].loadMaterialLighting(Pool::_programShader, material);
-
-		//// obtém a localização do uniform
-		//modelViewId = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ModelView");
-
-		//// atribui o valor ao uniform
-		//glProgramUniformMatrix4fv(Pool::_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
-
-		//GLint locationTexSampler1 = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "sampler");
-		//glProgramUniform1i(Pool::_programShader, locationTexSampler1, i /*unidade de textura*/);
-		//glProgramUniform1i(Pool::_programShader, renderTex, 1);
-
-		//// desenha a bola na tela
-		//glBindVertexArray(0);
-		//glDrawArrays(GL_TRIANGLES, 0, _rendererBalls[i].getBallVertices().size() / 8);
-
-
-
-
-
-		//Pool::Material material = _rendererBalls[i].getBallMaterial();
-		//std::cout << material.map_kd << std::endl;
-
-		//_rendererBalls[i].loadMaterialLighting(Pool::_programShader, material);
-
-		//// translação da bola
-		//glm::mat4 translatedModel = glm::translate(_modelMatrix, _rendererBalls[i].getPosition());
-
-		//// rotação da bola em torno do eixo Z
-		//glm::mat4 rotatedModel = glm::rotate(translatedModel, glm::radians(_rendererBalls[i].getOrientation().x), glm::vec3(0.0f, 0.0f, 1.0f));	// rotação no eixo z
-		//rotatedModel = glm::rotate(rotatedModel, glm::radians(_rendererBalls[i].getOrientation().y), glm::vec3(0.0f, 1.0f, 0.0f));				// rotação no eixo y
-		//rotatedModel = glm::rotate(rotatedModel, glm::radians(_rendererBalls[i].getOrientation().x), glm::vec3(1.0f, 0.0f, 0.0f));				// rotação no eixo x
-
-		//// escala de cada bola
-		//glm::mat4 scaledModel = glm::scale(rotatedModel, glm::vec3(0.08f));
-
-		//// modelo de visualização do objeto
-		//glm::mat4 modelView = _viewMatrix * scaledModel;
-
-		//// obtém a localização do uniform
-		//GLint modelViewId = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ModelView");
-
-		//// atribui o valor ao uniform
-		//glProgramUniformMatrix4fv(Pool::_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
-
-		//GLint renderTex = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "renderTex");
-		//glProgramUniform1i(Pool::_programShader, renderTex, 0);
-
-		//GLint locationTexSampler1 = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "sampler");
-		//glProgramUniform1i(Pool::_programShader, locationTexSampler1, i/*unidade de textura*/);
-		//glProgramUniform1i(Pool::_programShader, renderTex, 1);
-
-		//// desenha a bola na tela
-		//glBindVertexArray(0);
-		//glDrawArrays(GL_TRIANGLES, 0, _rendererBalls[i].getBallVertices().size() / 8);
 	}
 
 	// se animação da bola iniciou
@@ -456,7 +390,7 @@ void display(void) {
 			_rendererBalls[_animatedBallIndex].getPosition().z + 0.001f
 		));
 
-		// roda a bola
+		// roda a bola em X, Y e Z
 		_rendererBalls[_animatedBallIndex].setOrientation(_rendererBalls[_animatedBallIndex].getOrientation() + 2.0f);
 
 		// se colidiu com outro objeto
@@ -537,11 +471,11 @@ void printErrorCallback(int code, const char* description) {
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	// convert the mouse position to normalized device coordinates (NDC)
+	// converte a posição do mouse em coordenadas normalizadas
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
-	// calculate the zoom factor based on the scroll offset
+	// calcula o zoom com base no deslocamento do scrol
 	float zoomFactor = 1.0f + static_cast<float>(yoffset) * _zoomSpeed;
 
 	Pool::_viewMatrix = glm::scale(Pool::_viewMatrix, glm::vec3(zoomFactor, zoomFactor, 1.0f));
@@ -575,13 +509,13 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 
 	float sensitivity = 0.1f;
 
-	// aplicar rotação horizontal 
+	// aplica rotação horizontal 
 	Pool::_viewMatrix = glm::rotate(Pool::_viewMatrix, glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// calcular o vetor direito da câmera
+	// calcula o vetor "direito" da câmera
 	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(Pool::_viewMatrix[2])));
 
-	// aplicar rotação vertical 
+	// aplica rotação vertical 
 	Pool::_viewMatrix = glm::rotate(Pool::_viewMatrix, glm::radians(yOffset), right);
 }
 
@@ -617,6 +551,7 @@ void charCallback(GLFWwindow* window, unsigned int codepoint)
 		break;
 
 	case GLFW_KEY_SPACE:
+		// não permite voltar a iniciar animação, depois de iniciar uma vez e terminar
 		if (!_animationFinished) {
 			_animationStarted = true;
 			std::cout << "Animacao da bola iniciada." << std::endl;

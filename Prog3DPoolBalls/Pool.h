@@ -50,7 +50,12 @@ namespace Pool {
 	extern glm::mat4 _projectionMatrix;
 	extern glm::mat3 _normalMatrix;
 
-	// classe base da biblioteca
+	// funções globais da biblioteca
+	void bindProgramShader(GLuint* programShader);
+	void sendAttributesToProgramShader(GLuint* programShader);
+	void sendUniformsToProgramShader(GLuint* programShader, glm::mat4* modelMatrix, glm::mat4* viewMatrix, glm::mat4* modelViewMatrix, glm::mat4* projectionMatrix, glm::mat3* normalMatrix);
+
+	// classe para renderizar bolas
 	class RendererBall {
 	private:
 		// atributos privados
