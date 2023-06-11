@@ -39,14 +39,7 @@ GLuint _tableVBO;
 const int _numberOfBalls = 15;
 Pool::RendererBall _rendererBalls[_numberOfBalls];
 
-// shaders
-GLuint _programShader;
-
 // câmara
-glm::mat4 _modelMatrix;
-glm::mat4 _viewMatrix;
-glm::mat4 _projectionMatrix;
-glm::mat3 _normalMatrix;
 GLfloat _angle = 0.0f;
 glm::vec3 _cameraPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 
@@ -61,47 +54,9 @@ float _maxZoom = 10.0f;
 float _zoomSpeed = 0.1f;
 
 // animação de uma bola
+int _animatedBallIndex = 4;
 bool _animationStarted = false;
 bool _animationFinished = false;
-int animatedballIndex = 4;
-
-// posições das bolas
-std::vector<glm::vec3> _ballPositions = {
-	glm::vec3(1.1f, 0.33f, 1.1f),		// bola 1
-	glm::vec3(-1.1f, 0.33f, -1.1f),		// bola 2
-	glm::vec3(-1.1f, 0.33f, 1.1f),		// bola 3
-	glm::vec3(1.1f, 0.33f, -1.1f),		// bola 4
-	glm::vec3(0.1f, 0.33f, -0.1f),		// bola 5
-	glm::vec3(-0.3f, 0.33f, -0.3f),		// bola 6
-	glm::vec3(-0.6f, 0.33f, -0.4f),		// bola 7
-	glm::vec3(0.8f, 0.33f, 0.7f),		// bola 8
-	glm::vec3(-0.8f, 0.33f, -0.2f),		// bola 9
-	glm::vec3(0.3f, 0.33f, 0.7f),		// bola 10
-	glm::vec3(-0.2f, 0.33f, -0.8f),		// bola 11
-	glm::vec3(0.7f, 0.33f, 0.5f),		// bola 12
-	glm::vec3(-0.9f, 0.33f, 0.6f),		// bola 13
-	glm::vec3(0.1f, 0.33f, 0.3f),		// bola 14
-	glm::vec3(0.4f, 0.33f, -0.6f),		// bola 15
-};
-
-// rotações das bolas
-std::vector<float> _ballRotations = {
-	0.0f,		// bola 1
-	0.0f,		// bola 2
-	0.0f,		// bola 3
-	0.0f,		// bola 4
-	0.0f,		// bola 5
-	0.0f,		// bola 6
-	0.0f,		// bola 7
-	0.0f,		// bola 8
-	0.0f,		// bola 9
-	0.0f,		// bola 10
-	0.0f,		// bola 11
-	0.0f,		// bola 12
-	0.0f,		// bola 13
-	0.0f,		// bola 14
-	0.0f,		// bola 15
-};
 
 #pragma endregion
 
@@ -294,12 +249,58 @@ void init(void) {
 	// desvincula o VAO atual
 	glBindVertexArray(_tableVAO);
 
-	// carrega o modelo, material e textura de cada bola
-	// e envia os dados para a GPU
+	// posições das bolas
+	std::vector<glm::vec3> _ballPositions = {
+		glm::vec3(1.1f, 0.33f, 1.1f),		// bola 1
+		glm::vec3(-1.1f, 0.33f, -1.1f),		// bola 2
+		glm::vec3(-1.1f, 0.33f, 1.1f),		// bola 3
+		glm::vec3(1.1f, 0.33f, -1.1f),		// bola 4
+		glm::vec3(0.1f, 0.33f, -0.1f),		// bola 5
+		glm::vec3(-0.3f, 0.33f, -0.3f),		// bola 6
+		glm::vec3(-0.6f, 0.33f, -0.4f),		// bola 7
+		glm::vec3(0.8f, 0.33f, 0.7f),		// bola 8
+		glm::vec3(-0.8f, 0.33f, -0.2f),		// bola 9
+		glm::vec3(0.3f, 0.33f, 0.7f),		// bola 10
+		glm::vec3(-0.2f, 0.33f, -0.8f),		// bola 11
+		glm::vec3(0.7f, 0.33f, 0.5f),		// bola 12
+		glm::vec3(-0.9f, 0.33f, 0.6f),		// bola 13
+		glm::vec3(0.1f, 0.33f, 0.3f),		// bola 14
+		glm::vec3(0.4f, 0.33f, -0.6f),		// bola 15
+	};
+
+	// rotações das bolas
+	std::vector<glm::vec3> _ballOrientations = {
+		glm::vec3(0.0f),		// bola 1
+		glm::vec3(0.0f),		// bola 2
+		glm::vec3(0.0f),		// bola 3
+		glm::vec3(0.0f),		// bola 4
+		glm::vec3(0.0f),		// bola 5
+		glm::vec3(0.0f),		// bola 6
+		glm::vec3(0.0f),		// bola 7
+		glm::vec3(0.0f),		// bola 8
+		glm::vec3(0.0f),		// bola 9
+		glm::vec3(0.0f),		// bola 10
+		glm::vec3(0.0f),		// bola 11
+		glm::vec3(0.0f),		// bola 12
+		glm::vec3(0.0f),		// bola 13
+		glm::vec3(0.0f),		// bola 14
+		glm::vec3(0.0f),		// bola 15
+	};
+
+	// para cada bola, instancia com um identificador único
+	// carrega o modelo, material e textura,
+	// envia os dados para a GPU,
+	// e define a posição e orientação na cena
 	for (int i = 0; i < _numberOfBalls; i++) {
+		_rendererBalls[i].setId(i);
+
 		std::string objFilepath = "textures/Ball" + std::to_string(i + 1) + ".obj";
 		_rendererBalls[i].Read(objFilepath);
+
 		_rendererBalls[i].Send();
+
+		_rendererBalls[i].setPosition(_ballPositions[i]);
+		_rendererBalls[i].setOrientation(_ballOrientations[i]);
 	}
 
 	// cria informações dos shaders
@@ -310,29 +311,38 @@ void init(void) {
 	};
 
 	// carrega shaders
-	_programShader = loadShaders(shaders);
+	Pool::_programShader = loadShaders(shaders);
 
 	// se houve erros ao carregar shaders
-	if (!_programShader) {
+	if (!Pool::_programShader) {
 		std::cout << "Erro ao carregar shaders: " << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
-	bindProgramShader(&_programShader);
-	sendAttributesToProgramShader(&_programShader);
+	//// vincula, atribui os atributos e os uniforms ao programa shader para cada bola
+	//for (int i = 0; i < _numberOfBalls; i++) {
+
+	//}
+
+	// vincula o programa shader
+	bindProgramShader(&Pool::_programShader);
+
+	// atribui os atributos dos vértices ao programa shader
+	sendAttributesToProgramShader(&Pool::_programShader);
 
 	// matrizes de transformação
-	_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.0f, 1.0f, 0.0f));
-	_viewMatrix = glm::lookAt(
+	Pool::_modelMatrix = glm::rotate(glm::mat4(1.0f), _angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	Pool::_viewMatrix = glm::lookAt(
 		_cameraPosition,				// eye (posição da câmara).
 		glm::vec3(0.0f, 0.0f, 0.0f),	// center (para onde está a "olhar")
 		glm::vec3(0.0f, 1.0f, 0.0f)		// up
 	);
-	glm::mat4 modelViewMatrix = _viewMatrix * _modelMatrix;
-	_projectionMatrix = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	_normalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
+	glm::mat4 modelViewMatrix = Pool::_viewMatrix * Pool::_modelMatrix;
+	Pool::_projectionMatrix = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	Pool::_normalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
 
-	sendUniformsToProgramShader(&_programShader, &_modelMatrix, &_viewMatrix, &modelViewMatrix, &_projectionMatrix, &_normalMatrix);
+	// atribui as matrizes de transformação ao programa shader
+	sendUniformsToProgramShader(&Pool::_programShader, &Pool::_modelMatrix, &Pool::_viewMatrix, &modelViewMatrix, &Pool::_projectionMatrix, &Pool::_normalMatrix);
 
 	// carrega os diferentes tipos de luzes da cena
 	loadSceneLighting();
@@ -350,21 +360,21 @@ void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// translação da mesa
-	glm::mat4 translatedModel = glm::translate(_modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
+	glm::mat4 translatedModel = glm::translate(Pool::_modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// modelo de visualização do objeto
-	glm::mat4 modelView = _viewMatrix * translatedModel;
+	glm::mat4 modelView = Pool::_viewMatrix * translatedModel;
 
 	// obtém a localização do uniform
-	GLint modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
+	GLint modelViewId = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ModelView");
 
 	// atribui o valor ao uniform
-	glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
+	glProgramUniformMatrix4fv(Pool::_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
-	GLint renderTex = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "renderTex");
-	glProgramUniform1i(_programShader, renderTex, 0);
+	GLint renderTex = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "renderTex");
+	glProgramUniform1i(Pool::_programShader, renderTex, 0);
 
-	GLint viewPositionLoc = glGetUniformLocation(_programShader, "viewPosition");
+	GLint viewPositionLoc = glGetUniformLocation(Pool::_programShader, "viewPosition");
 	glUniform3f(viewPositionLoc, _cameraPosition.x, _cameraPosition.y, _cameraPosition.z);
 
 	// desenha a mesa na tela
@@ -373,48 +383,81 @@ void display(void) {
 
 	// desenha para cada bola
 	for (int i = 0; i < _numberOfBalls; i++) {
-		// translação da bola
-		translatedModel = glm::translate(_modelMatrix, _ballPositions[i]);
+		_rendererBalls[i].Draw(_rendererBalls[i].getPosition(), _rendererBalls[i].getOrientation());
 
-		// rotação da bola em torno do eixo Z
-		glm::mat4 rotatedModel = glm::rotate(translatedModel, glm::radians(_ballRotations[i]), glm::vec3(0.0f, 0.0f, 1.0f));	// rotação no eixo z
-		rotatedModel = glm::rotate(rotatedModel, glm::radians(_ballRotations[i]), glm::vec3(0.0f, 1.0f, 0.0f));					// rotação no eixo y
-		rotatedModel = glm::rotate(rotatedModel, glm::radians(_ballRotations[i]), glm::vec3(1.0f, 0.0f, 0.0f));					// rotação no eixo x
+		//Pool::Material material = _rendererBalls[i].getBallMaterial();
 
-		// escala de cada bola
-		glm::mat4 scaledModel = glm::scale(rotatedModel, glm::vec3(0.08f));
+		////std::cout << _rendererBalls[i].getBallMaterial().map_kd << std::endl;
+		//std::cout << material.map_kd << std::endl;
 
-		// modelo de visualização do objeto
-		modelView = _viewMatrix * scaledModel;
+		//_rendererBalls[i].loadMaterialLighting(Pool::_programShader, material);
 
-		//_rendererBalls.Draw(_ballPositions[i], glm::vec3(0));
+		//// obtém a localização do uniform
+		//modelViewId = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ModelView");
 
-		Pool::Material material = _rendererBalls[i].getBallMaterial();
-		_rendererBalls[i].loadMaterialLighting(_programShader, material);
+		//// atribui o valor ao uniform
+		//glProgramUniformMatrix4fv(Pool::_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
 
-		// obtém a localização do uniform
-		modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
+		//GLint locationTexSampler1 = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "sampler");
+		//glProgramUniform1i(Pool::_programShader, locationTexSampler1, i /*unidade de textura*/);
+		//glProgramUniform1i(Pool::_programShader, renderTex, 1);
 
-		// atribui o valor ao uniform
-		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
+		//// desenha a bola na tela
+		//glBindVertexArray(0);
+		//glDrawArrays(GL_TRIANGLES, 0, _rendererBalls[i].getBallVertices().size() / 8);
 
-		GLint locationTexSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "sampler");
-		glProgramUniform1i(_programShader, locationTexSampler1, i /*unidade de textura*/);
-		glProgramUniform1i(_programShader, renderTex, 1);
 
-		// desenha a bola na tela
-		glBindVertexArray(0);
-		glDrawArrays(GL_TRIANGLES, 0, _rendererBalls[i].getBallVertices().size() / 8);
+
+
+
+		//Pool::Material material = _rendererBalls[i].getBallMaterial();
+		//std::cout << material.map_kd << std::endl;
+
+		//_rendererBalls[i].loadMaterialLighting(Pool::_programShader, material);
+
+		//// translação da bola
+		//glm::mat4 translatedModel = glm::translate(_modelMatrix, _rendererBalls[i].getPosition());
+
+		//// rotação da bola em torno do eixo Z
+		//glm::mat4 rotatedModel = glm::rotate(translatedModel, glm::radians(_rendererBalls[i].getOrientation().x), glm::vec3(0.0f, 0.0f, 1.0f));	// rotação no eixo z
+		//rotatedModel = glm::rotate(rotatedModel, glm::radians(_rendererBalls[i].getOrientation().y), glm::vec3(0.0f, 1.0f, 0.0f));				// rotação no eixo y
+		//rotatedModel = glm::rotate(rotatedModel, glm::radians(_rendererBalls[i].getOrientation().x), glm::vec3(1.0f, 0.0f, 0.0f));				// rotação no eixo x
+
+		//// escala de cada bola
+		//glm::mat4 scaledModel = glm::scale(rotatedModel, glm::vec3(0.08f));
+
+		//// modelo de visualização do objeto
+		//glm::mat4 modelView = _viewMatrix * scaledModel;
+
+		//// obtém a localização do uniform
+		//GLint modelViewId = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ModelView");
+
+		//// atribui o valor ao uniform
+		//glProgramUniformMatrix4fv(Pool::_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
+
+		//GLint renderTex = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "renderTex");
+		//glProgramUniform1i(Pool::_programShader, renderTex, 0);
+
+		//GLint locationTexSampler1 = glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "sampler");
+		//glProgramUniform1i(Pool::_programShader, locationTexSampler1, i/*unidade de textura*/);
+		//glProgramUniform1i(Pool::_programShader, renderTex, 1);
+
+		//// desenha a bola na tela
+		//glBindVertexArray(0);
+		//glDrawArrays(GL_TRIANGLES, 0, _rendererBalls[i].getBallVertices().size() / 8);
 	}
 
 	// se animação da bola iniciou
 	if (_animationStarted && !_animationFinished) {
-		// move a bola
-		_ballPositions[animatedballIndex].x += 0.001f;
-		_ballPositions[animatedballIndex].z += 0.001f;
+		// move a bola em X e Z
+		_rendererBalls[_animatedBallIndex].setPosition(glm::vec3(
+			_rendererBalls[_animatedBallIndex].getPosition().x + 0.001f,
+			_rendererBalls[_animatedBallIndex].getPosition().y,
+			_rendererBalls[_animatedBallIndex].getPosition().z + 0.001f
+		));
 
 		// roda a bola
-		_ballRotations[animatedballIndex] += 2.0f;
+		_rendererBalls[_animatedBallIndex].setOrientation(_rendererBalls[_animatedBallIndex].getOrientation() + 2.0f);
 
 		// se colidiu com outro objeto
 		if (isColliding()) {
@@ -427,45 +470,45 @@ void display(void) {
 
 void loadSceneLighting(void) {
 	// fonte de luz ambiente
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(6.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "ambientLight.ambient"), 1, glm::value_ptr(glm::vec3(6.0f)));
 
 	// fonte de luz direcional
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.direction"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "directionalLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
 
 	// fonte de luz pontual 
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.position"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.constant"), 1.0f);
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.linear"), 0.06f);
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "pointLight.quadratic"), 0.02f);
 
 	// fonte de luz cónica
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.position"), 1, glm::value_ptr(glm::vec3(0.0f, 2.2f, 0.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.direction"), 1, glm::value_ptr(glm::vec3(0.0f, -0.1f, 0.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
-	glProgramUniform3fv(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.constant"), 1.0f);
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.linear"), 0.09f);
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.quadratic"), 0.032f);
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.cutOff"), glm::cos(glm::radians(20.0f)));
-	glProgramUniform1f(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "spotLight.outerCutOff"), glm::cos(glm::radians(30.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.position"), 1, glm::value_ptr(glm::vec3(0.0f, 2.2f, 0.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.direction"), 1, glm::value_ptr(glm::vec3(0.0f, -0.1f, 0.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.ambient"), 1, glm::value_ptr(glm::vec3(5.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.diffuse"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform3fv(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.specular"), 1, glm::value_ptr(glm::vec3(1.0f)));
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.constant"), 1.0f);
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.linear"), 0.09f);
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.quadratic"), 0.032f);
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.cutOff"), glm::cos(glm::radians(20.0f)));
+	glProgramUniform1f(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "spotLight.outerCutOff"), glm::cos(glm::radians(30.0f)));
 
 	// define a luz padrão apresentada
-	glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), 1);
+	glProgramUniform1i(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "lightModel"), 1);
 }
 
 bool isColliding(void) {
 	float _ballRadius = 0.08f;
 
-	for (int i = 0; i < _ballPositions.size(); i++) {
-		if (i != animatedballIndex) {
-			float distance = glm::distance(_ballPositions[i], _ballPositions[animatedballIndex]);
+	for (int i = 0; i < _numberOfBalls; i++) {
+		if (i != _animatedBallIndex) {
+			float distance = glm::distance(_rendererBalls[i].getPosition(), _rendererBalls[_animatedBallIndex].getPosition());
 
 			// se colidiu com alguma bola
 			if (distance <= 2 * _ballRadius) {
@@ -475,8 +518,8 @@ bool isColliding(void) {
 	}
 
 	// se colidiu com os limites da mesa
-	if (_ballPositions[animatedballIndex].x + _ballRadius >= 1.25f || _ballPositions[animatedballIndex].x - _ballRadius <= -1.25f ||
-		_ballPositions[animatedballIndex].y + _ballRadius >= 1.25f || _ballPositions[animatedballIndex].y - _ballRadius <= -1.25f) {
+	if (_rendererBalls[_animatedBallIndex].getPosition().x + _ballRadius >= 1.25f || _rendererBalls[_animatedBallIndex].getPosition().x - _ballRadius <= -1.25f ||
+		_rendererBalls[_animatedBallIndex].getPosition().y + _ballRadius >= 1.25f || _rendererBalls[_animatedBallIndex].getPosition().y - _ballRadius <= -1.25f) {
 		return true;
 	}
 
@@ -494,14 +537,14 @@ void printErrorCallback(int code, const char* description) {
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	// Convert the mouse position to normalized device coordinates (NDC)
+	// convert the mouse position to normalized device coordinates (NDC)
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
-	// Calculate the zoom factor based on the scroll offset
+	// calculate the zoom factor based on the scroll offset
 	float zoomFactor = 1.0f + static_cast<float>(yoffset) * _zoomSpeed;
 
-	_viewMatrix = glm::scale(_viewMatrix, glm::vec3(zoomFactor, zoomFactor, 1.0f));
+	Pool::_viewMatrix = glm::scale(Pool::_viewMatrix, glm::vec3(zoomFactor, zoomFactor, 1.0f));
 
 	_zoomLevel += yoffset * _zoomSpeed;
 	_zoomLevel = std::max(_minZoom, std::min(_maxZoom, _zoomLevel));
@@ -514,7 +557,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 		_lastX = xpos;
 		_lastY = ypos;
 		_firstMouse = false;
-		return; // Sai da função se o botão do mouse esquerdo não estiver pressionado
+		return;		// sai da função se o botão do mouse esquerdo não estiver pressionado
 	}
 
 	if (_firstMouse)
@@ -532,14 +575,14 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 
 	float sensitivity = 0.1f;
 
-	// Aplicar rotação horizontal 
-	_viewMatrix = glm::rotate(_viewMatrix, glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f));
+	// aplicar rotação horizontal 
+	Pool::_viewMatrix = glm::rotate(Pool::_viewMatrix, glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// Calcular o vetor direito da câmera
-	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(_viewMatrix[2])));
+	// calcular o vetor direito da câmera
+	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(Pool::_viewMatrix[2])));
 
-	// Aplicar rotação vertical 
-	_viewMatrix = glm::rotate(_viewMatrix, glm::radians(yOffset), right);
+	// aplicar rotação vertical 
+	Pool::_viewMatrix = glm::rotate(Pool::_viewMatrix, glm::radians(yOffset), right);
 }
 
 void charCallback(GLFWwindow* window, unsigned int codepoint)
@@ -551,25 +594,25 @@ void charCallback(GLFWwindow* window, unsigned int codepoint)
 	{
 	case '1':
 		lightModel = 1;
-		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		glProgramUniform1i(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		std::cout << "Luz ambiente ativada." << std::endl;
 		break;
 
 	case '2':
 		lightModel = 2;
-		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		glProgramUniform1i(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		std::cout << "Luz direcional ativada." << std::endl;
 		break;
 
 	case '3':
 		lightModel = 3;
-		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		glProgramUniform1i(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		std::cout << "Luz pontual ativada." << std::endl;
 		break;
 
 	case '4':
 		lightModel = 4;
-		glProgramUniform1i(_programShader, glGetProgramResourceLocation(_programShader, GL_UNIFORM, "lightModel"), lightModel);
+		glProgramUniform1i(Pool::_programShader, glGetProgramResourceLocation(Pool::_programShader, GL_UNIFORM, "lightModel"), lightModel);
 		std::cout << "Luz conica ativada." << std::endl;
 		break;
 

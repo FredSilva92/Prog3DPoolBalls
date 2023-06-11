@@ -35,17 +35,88 @@
 
 namespace Pool {
 
+#pragma region variáveis globais
+
+	GLuint _programShader;
+	glm::mat4 _modelMatrix;
+	glm::mat4 _viewMatrix;
+	glm::mat4 _projectionMatrix;
+	glm::mat3 _normalMatrix;
+
+#pragma endregion
+
+
+#pragma region getters e setters da classe RendererBall
+
+	// getters
+	const std::vector<float>& RendererBall::getBallVertices() const {   // retorna apontador para ser mais eficiente ao renderizar
+		return *_ballVertices;
+	}
+
+	const Material& RendererBall::getBallMaterial() const {
+		return *_ballMaterial;
+	}
+
+	glm::vec3 RendererBall::getPosition()const {
+		return _ballPosition;
+	}
+
+	glm::vec3 RendererBall::getOrientation() const {
+		return _ballOrientation;
+	}
+
+	// setters
+	void RendererBall::setId(int id) {
+		_id = id;
+	}
+
+	void RendererBall::setPosition(glm::vec3 position) {
+		_ballPosition = position;
+	}
+
+	void RendererBall::setOrientation(glm::vec3 orientation) {
+		_ballOrientation = orientation;
+	}
+
+#pragma endregion
+
+
+#pragma region construtores e destrutor da classe RendererBall
+
+	// construtor
+	RendererBall::RendererBall() {
+		_id = 0;
+		_objFilepath = new char;
+		_ballVertices = new std::vector<float>;
+		_ballVAO = new GLuint;
+		_ballVBO = new GLuint;
+		_ballMaterial = new Material;
+		_ballTexture = new Texture;
+	}
+
+	// destrutor
+	RendererBall::~RendererBall() {
+		// liberta memória
+		delete[] _objFilepath;
+		delete[] _ballVertices;
+		delete[] _ballVAO;
+		delete[] _ballVBO;
+	}
+
+#pragma endregion
+
+
 #pragma region funções principais da classe RendererBall
 
 	void RendererBall::Read(const std::string obj_model_filepath) {
-		_objFilepath = obj_model_filepath.c_str();
-
 		std::vector<float> vertices;
 
 		tinyobj::attrib_t attributes;
 		std::vector<tinyobj::shape_t> shapes;
 		std::vector<tinyobj::material_t> materials;
 		std::string warning, error;
+
+		_objFilepath = obj_model_filepath.c_str();
 
 		// se houve erros ao carregar o ficheiro .obj
 		if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warning, &error, _objFilepath)) {
@@ -135,12 +206,8 @@ namespace Pool {
 		GLuint textureName;
 		glGenTextures(1, &textureName);
 
-		// saber atual unidade de textura para ativar a próxima
-		GLint currentTextureUnits;
-		glGetIntegerv(GL_TEXTURE_BINDING_2D, &currentTextureUnits);
-
 		// ativa a unidade de textura atual (inicia na unidade 0)
-		glActiveTexture(GL_TEXTURE0 + currentTextureUnits);
+		glActiveTexture(GL_TEXTURE0 + _id);
 
 		// vincula um nome de textura ao target GL_TEXTURE_2D da unidade de textura ativa
 		glBindTexture(GL_TEXTURE_2D, textureName);
@@ -159,7 +226,39 @@ namespace Pool {
 	}
 
 	void RendererBall::Draw(glm::vec3 position, glm::vec3 orientation) {
+		Material* material = _ballMaterial;
+		loadMaterialLighting(_programShader, *material);
 
+		// translação da bola
+		glm::mat4 translatedModel = glm::translate(_modelMatrix, _ballPosition);
+
+		// rotação da bola em torno do eixo Z
+		glm::mat4 rotatedModel = glm::rotate(translatedModel, glm::radians(_ballOrientation.z), glm::vec3(0.0f, 0.0f, 1.0f));	// rotação no eixo z
+		rotatedModel = glm::rotate(rotatedModel, glm::radians(_ballOrientation.y), glm::vec3(0.0f, 1.0f, 0.0f));				// rotação no eixo y
+		rotatedModel = glm::rotate(rotatedModel, glm::radians(_ballOrientation.x), glm::vec3(1.0f, 0.0f, 0.0f));				// rotação no eixo x
+
+		// escala de cada bola
+		glm::mat4 scaledModel = glm::scale(rotatedModel, glm::vec3(0.08f));
+
+		// modelo de visualização do objeto
+		glm::mat4 modelView = _viewMatrix * scaledModel;
+
+		// obtém a localização do uniform
+		GLint modelViewId = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "ModelView");
+
+		// atribui o valor ao uniform
+		glProgramUniformMatrix4fv(_programShader, modelViewId, 1, GL_FALSE, glm::value_ptr(modelView));
+
+		GLint renderTex = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "renderTex");
+		glProgramUniform1i(_programShader, renderTex, 0);
+
+		GLint locationTexSampler1 = glGetProgramResourceLocation(_programShader, GL_UNIFORM, "sampler");
+		glProgramUniform1i(_programShader, locationTexSampler1, _id/*unidade de textura*/);
+		glProgramUniform1i(_programShader, renderTex, 1);
+
+		// desenha a bola na tela
+		glBindVertexArray(0);
+		glDrawArrays(GL_TRIANGLES, 0, _ballVertices->size() / 8);
 	}
 
 #pragma endregion

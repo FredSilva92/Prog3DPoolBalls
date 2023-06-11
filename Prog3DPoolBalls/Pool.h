@@ -43,10 +43,19 @@ namespace Pool {
 		unsigned char* image;	// imagem da textura
 	} Texture;
 
+	// variáveis globais
+	extern GLuint _programShader;
+	extern glm::mat4 _modelMatrix;
+	extern glm::mat4 _viewMatrix;
+	extern glm::mat4 _projectionMatrix;
+	extern glm::mat3 _normalMatrix;
+
 	// classe base da biblioteca
 	class RendererBall {
 	private:
 		// atributos privados
+		int _id;	// identificador único para depois saber qual a unidade de textura que pertence, entre outros dados que este seja útil
+
 		const char* _objFilepath;
 		std::vector<float>* _ballVertices;
 		GLuint* _ballVAO;
@@ -54,34 +63,26 @@ namespace Pool {
 		Material* _ballMaterial;
 		Texture* _ballTexture;
 
-	public:
-		// aceder atributos fora da classe - getters
-		const std::vector<float>& getBallVertices() const {   // retorna apontador para ser mais eficiente ao renderizar
-			return *_ballVertices;
-		}
+		glm::vec3 _ballPosition;
+		glm::vec3 _ballOrientation;
 
-		const Material& getBallMaterial() const {
-			return *_ballMaterial;
-		}
+	public:
+		// getters - definir valores de atributos fora da classe
+		const std::vector<float>& getBallVertices() const;
+		const Material& getBallMaterial() const;
+		glm::vec3 getPosition() const;
+		glm::vec3 getOrientation() const;
+
+		// setters - obter valores de atributos fora da classe
+		void setId(int id);
+		void setPosition(glm::vec3 position);
+		void setOrientation(glm::vec3 orientation);
 
 		// construtor
-		RendererBall() {
-			_objFilepath = new char;
-			_ballVertices = new std::vector<float>;
-			_ballVAO = new GLuint;
-			_ballVBO = new GLuint;
-			_ballMaterial = new Material;
-			_ballTexture = new Texture;
-		}
+		RendererBall();
 
 		// destrutor
-		~RendererBall() {
-			// liberta memória
-			delete[] _objFilepath;
-			delete[] _ballVertices;
-			delete[] _ballVAO;
-			delete[] _ballVBO;
-		}
+		~RendererBall();
 
 		// principais
 		void Read(const std::string obj_model_filepath);
