@@ -534,7 +534,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	// calcula o zoom com base no deslocamento do scrol
 	float zoomFactor = 1.0f + static_cast<float>(yoffset) * _zoomSpeed;
 
-	Pool::_viewMatrix = glm::scale(Pool::_viewMatrix, glm::vec3(zoomFactor, zoomFactor, 1.0f));
+	Pool::_viewMatrix = glm::scale(Pool::_viewMatrix, glm::vec3(zoomFactor, zoomFactor, zoomFactor));
 
 	_zoomLevel += yoffset * _zoomSpeed;
 	_zoomLevel = std::max(_minZoom, std::min(_maxZoom, _zoomLevel));
