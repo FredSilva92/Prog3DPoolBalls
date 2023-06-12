@@ -1,6 +1,6 @@
 /*
  * @descrição	Ficheiro relativo ao vertex shader.
- * @ficheiro	pool.vert
+ * @ficheiro	Pool.vert
  * @autor(s)	Henrique Azevedo a23488, Luís Pereira a18446, Pedro Silva a20721, Vânia Pereira a19264
  * @data		11/06/2023
 */
